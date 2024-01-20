@@ -23,6 +23,7 @@ target_sources(Powder
     PluginEditor.cpp
     PluginProcessor.cpp
     FFTComponent.cpp
+    ControlPanel.cpp
 )
 
 target_compile_definitions(Powder

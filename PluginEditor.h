@@ -3,6 +3,7 @@
 #include "PluginProcessor.h"
 
 #include "FFTComponent.h"
+#include "ControlPanel.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor
@@ -21,6 +22,7 @@ private:
     AudioPluginAudioProcessor& processorRef;
 
     FFTSpectrum fftSpectrum;
+    ControlPanel controlPanel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };
