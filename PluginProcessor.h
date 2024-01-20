@@ -43,25 +43,28 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    static constexpr size_t fftOrder = 11;
-    static constexpr size_t fftSize = 1 << fftOrder;
-    static constexpr size_t scopeSize = 512;
+    static constexpr int fftOrder = 11;
+    static constexpr int fftSize = 1 << fftOrder;
+    static constexpr int scopeSize = 512;
 
     //==============================================================================
+    bool isNextFFTBlockReady() const;
+    void nextFFTBlockReadyReset();
+    void processFFTData();
+    float getFFTData(int index) const;
 private:
     //==============================================================================
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
-
+    
     std::array<float, fftSize> fifo;
     std::array<float, 2 * fftSize> fftData;
     size_t fifoIndex;
     bool nextFFTBlockReady;
-    std::array<float, scopeSize> scopeData;
 
     juce::AudioBuffer<float> sumBuffer;
 
-    void pushNextSampleIntoFifo(const float& sample) noexcept;
+    void pushNextSampleIntoFifo(const float& sample);
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

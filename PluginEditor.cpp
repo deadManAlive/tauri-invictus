@@ -17,9 +17,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     int min_height = 400;
     int max_height = 1600;
     int default_size = 600;
-    setResizeLimits(min_height, static_cast<int>(min_height/ratio), max_height, static_cast<int>(max_height/ratio));
+    setResizeLimits(min_height, (int)(min_height/ratio), max_height, (int)(max_height/ratio));
     getConstrainer()->setFixedAspectRatio(ratio);
-    setSize(default_size, static_cast<int>(default_size/ratio));
+    setSize(default_size, (int)(default_size/ratio));
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
