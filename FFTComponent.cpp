@@ -14,15 +14,16 @@ void FFTSpectrum::paint(juce::Graphics& g) {
     g.setOpacity(1.0f);
     g.setColour(juce::Colours::white);
 
-    for (int i = 1; i < scopeSize; ++i) {
+    for (int i = 1; i < (scopeSize - 1); ++i) {
         auto width = getLocalBounds().getWidth();
         auto height = getLocalBounds().getHeight();
 
+        // TODO: doing this log in runtime is stupid
         g.drawLine({
-            (float) juce::jmap (i - 1, 0, scopeSize - 1, 0, width),
-            juce::jmap (scopeData[i - 1], 0.0f, 1.0f, (float) height, 0.0f),
-            (float) juce::jmap (i, 0, scopeSize - 1, 0, width),
-            juce::jmap (scopeData[i], 0.0f, 1.0f, (float) height, 0.0f) });
+            juce::mapFromLog10((float) i, 0001.f, (float)(scopeSize - 1)) * width,
+            juce::jmap (scopeData[i], 0.0f, 1.0f, (float) height, 0.0f),
+            juce::mapFromLog10((float) (i + 1), 0001.f, (float)(scopeSize - 1)) * width,
+            juce::jmap (scopeData[i + 1], 0.0f, 1.0f, (float) height, 0.0f) });
     }
 }
 

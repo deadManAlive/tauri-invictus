@@ -43,9 +43,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    static constexpr int fftOrder = 11;
+    static constexpr int fftOrder = 10;
     static constexpr int fftSize = 1 << fftOrder;
-    static constexpr int scopeSize = 512;
+    static constexpr int scopeSize = 1 << 12;
 
     //==============================================================================
     bool isNextFFTBlockReady() const;
@@ -57,6 +57,7 @@ private:
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
     
+    //NOTE: use circular buffer, this is ass...
     std::array<float, fftSize> fifo;
     std::array<float, 2 * fftSize> fftData;
     size_t fifoIndex;

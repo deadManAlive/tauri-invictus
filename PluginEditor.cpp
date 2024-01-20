@@ -13,7 +13,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(fftSpectrum);
     addAndMakeVisible(controlPanel);
 
-    double ratio = 16.0/9.0;
+    double ratio = 24.0/9.0;
     int min_height = 400;
     int max_height = 1600;
     int default_size = 600;
@@ -32,11 +32,6 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    // g.setColour (juce::Colours::white);
-    // g.setFont (15.0f);
-    // g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
-    // auto bounds = getLocalBounds();
-    // fftSpectrum.setBounds(bounds);
 }
 
 void AudioPluginAudioProcessorEditor::resized()
