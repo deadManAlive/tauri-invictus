@@ -1,6 +1,6 @@
 #pragma once
 
-#include <juce_audio_processors/juce_audio_processors.h>
+#include <JuceHeader.h>
 
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor
@@ -42,7 +42,26 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    static constexpr size_t fftOrder = 11;
+    static constexpr size_t fftSize = 1 << fftOrder;
+    static constexpr size_t scopeSize = 512;
+
+    //==============================================================================
 private:
+    //==============================================================================
+    juce::dsp::FFT forwardFFT;
+    juce::dsp::WindowingFunction<float> window;
+
+    std::array<float, fftSize> fifo;
+    std::array<float, 2 * fftSize> fftData;
+    size_t fifoIndex;
+    bool nextFFTBlockReady;
+    std::array<float, scopeSize> scopeData;
+
+    juce::AudioBuffer<float> sumBuffer;
+
+    void pushNextSampleIntoFifo(const float& sample) noexcept;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

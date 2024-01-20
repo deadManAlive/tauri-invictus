@@ -1,0 +1,9 @@
+{
+    "cmake.configureArgs": [
+        "-DJUCE_BUILD_EXTRAS=OFF",
+        "-DJUCE_BUILD_EXAMPLES=OFF",
+    ],
+    "C_Cpp.intelliSenseEngine": "default",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.cppStandard": "c++20",
+}

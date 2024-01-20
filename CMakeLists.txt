@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(JUCE)
 
 juce_add_plugin(Powder
-  COMPANY_NAME "Tauri Invictus"
+  COMPANY_NAME "Tauri-Invictus"
   IS_SYNTH FALSE
   IS_MIDI_EFFECT FALSE
   COPY_PLUGIN_AFTER_BUILD TRUE
@@ -16,10 +16,13 @@ juce_add_plugin(Powder
   PRODUCT_NAME "Powder Spectrum Analyzer"
 )
 
+juce_generate_juce_header(Powder)
+
 target_sources(Powder
   PRIVATE
     PluginEditor.cpp
     PluginProcessor.cpp
+    FFTComponent.cpp
 )
 
 target_compile_definitions(Powder

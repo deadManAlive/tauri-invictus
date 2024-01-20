@@ -11,6 +11,13 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
+     , forwardFFT(fftOrder)
+     , window(fftSize, juce::dsp::WindowingFunction<float>::hann)
+     , fifo{}
+     , fftData{}
+     , scopeData{}
+     , fifoIndex{0}
+     , nextFFTBlockReady{false}
 {
 }
 
@@ -88,7 +95,9 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    juce::ignoreUnused (sampleRate);
+
+    sumBuffer.setSize(1, samplesPerBlock);
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -129,6 +138,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    const auto bufferLength = buffer.getNumSamples();
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -145,11 +155,16 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    sumBuffer.clear();
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        // ..do something to the data...
+        sumBuffer.addFrom(0, 0, buffer, channel, 0, bufferLength);
+    }
+
+    const auto* sumResult = sumBuffer.getReadPointer(0);
+
+    for (int sample = 0; sample < bufferLength; ++sample) {
+        pushNextSampleIntoFifo(sumResult[sample]);
     }
 }
 
@@ -178,6 +193,21 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
     juce::ignoreUnused (data, sizeInBytes);
+}
+
+void AudioPluginAudioProcessor::pushNextSampleIntoFifo(const float& sample) noexcept
+{
+    if (fifoIndex == fftSize)
+    {
+            if (!nextFFTBlockReady)
+            {
+                fftData.fill(0.f);
+                std::copy_n(fifo.begin(), fifo.size(), fftData.begin());
+                nextFFTBlockReady = true;
+            }
+            fifoIndex = 0;
+        }
+        fifo[fifoIndex++] = sample;
 }
 
 //==============================================================================
