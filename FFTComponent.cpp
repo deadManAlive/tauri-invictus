@@ -20,10 +20,10 @@ void FFTSpectrum::paint(juce::Graphics& g) {
 
         // TODO: doing this log in runtime is stupid
         g.drawLine({
-            juce::mapFromLog10((float) i, 0001.f, (float)(scopeSize - 1)) * width,
-            juce::jmap (scopeData[i], 0.0f, 1.0f, (float) height, 0.0f),
-            juce::mapFromLog10((float) (i + 1), 0001.f, (float)(scopeSize - 1)) * width,
-            juce::jmap (scopeData[i + 1], 0.0f, 1.0f, (float) height, 0.0f) });
+            (float) juce::jmap (i - 1, 0, scopeSize - 1, 0, width),
+            juce::jmap (scopeData[i - 1], 0.0f, 1.0f, (float) height, 0.0f),
+            (float) juce::jmap (i, 0, scopeSize - 1, 0, width),
+            juce::jmap (scopeData[i], 0.0f, 1.0f, (float) height, 0.0f) });
     }
 }
 
