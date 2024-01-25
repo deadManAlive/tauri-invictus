@@ -3,9 +3,11 @@ project(POWDER VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(JUCE)
+add_subdirectory(melatonin_perfetto)
 
 juce_add_plugin(Powder
-  COMPANY_NAME "Tauri-Invictus"
+  COMPANY_NAME "Tauri Invictus"
+  BUNDLE_ID "com.tauriinvictus.powder"
   IS_SYNTH FALSE
   IS_MIDI_EFFECT FALSE
   COPY_PLUGIN_AFTER_BUILD TRUE
@@ -38,6 +40,7 @@ target_link_libraries(Powder
   PRIVATE
     juce::juce_audio_utils
     juce::juce_dsp
+    Melatonin::Perfetto
   PUBLIC
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags

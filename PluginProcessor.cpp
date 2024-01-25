@@ -16,12 +16,18 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
      , fifoIndex{0}
      , nextFFTBlockReady{false}
      , forwardFFT(fftOrder)
-     , window(fftSize, juce::dsp::WindowingFunction<float>::hann)
+     , window(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
+    #if PERFETTO
+        MelatoninPerfetto::get().beginSession();
+    #endif
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
 {
+    #if PERFETTO
+        MelatoninPerfetto::get().endSession();
+    #endif
 }
 
 //==============================================================================
@@ -132,6 +138,8 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                               juce::MidiBuffer& midiMessages)
 {
+    TRACE_DSP();
+    
     juce::ignoreUnused (midiMessages);
 
     juce::ScopedNoDenormals noDenormals;

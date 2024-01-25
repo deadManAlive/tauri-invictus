@@ -2,6 +2,8 @@
 
 #include <JuceHeader.h>
 
+#include "LockFreeBuffer.h"
+
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor
 {
@@ -66,6 +68,11 @@ private:
     juce::AudioBuffer<float> sumBuffer;
 
     void pushNextSampleIntoFifo(const float& sample);
+    //==============================================================================
+    #if PERFETTO
+        std::unique_ptr<perfetto::TracingSession> tracingSession;
+    #endif
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

@@ -1,4 +1,5 @@
 #include "FFTComponent.h"
+#include "PluginProcessor.h"
 
 FFTSpectrum::FFTSpectrum(AudioPluginAudioProcessor& p)
     : processorRef(p)
@@ -10,6 +11,8 @@ FFTSpectrum::FFTSpectrum(AudioPluginAudioProcessor& p)
 FFTSpectrum::~FFTSpectrum() {}
 
 void FFTSpectrum::paint(juce::Graphics& g) {
+    TRACE_COMPONENT();
+
     g.fillAll(juce::Colours::black);
     g.setOpacity(1.0f);
     g.setColour(juce::Colours::white);
