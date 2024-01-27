@@ -11,10 +11,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
-     , fifo{}
      , fftData{}
-     , fifoIndex{0}
-     , nextFFTBlockReady{false}
      , forwardFFT(fftOrder)
      , window(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
 {
@@ -170,9 +167,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     const auto* sumResult = sumBuffer.getReadPointer(0);
 
-    for (int sample = 0; sample < bufferLength; ++sample) {
-        pushNextSampleIntoFifo(sumResult[sample]);
-    }
+    lockFreeBuffer.addToFifo(sumResult, bufferLength);
 }
 
 //==============================================================================
@@ -202,36 +197,14 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
     juce::ignoreUnused (data, sizeInBytes);
 }
 
-bool AudioPluginAudioProcessor::isNextFFTBlockReady() const {
-    return nextFFTBlockReady;
-}
-
-void AudioPluginAudioProcessor::nextFFTBlockReadyReset() {
-    nextFFTBlockReady = false;
-}
-
 void AudioPluginAudioProcessor::processFFTData() {
+    lockFreeBuffer.readFromFifo(fftData.data(), fftSize);
     window.multiplyWithWindowingTable(fftData.data(), fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftData.data());
 }
 
 float AudioPluginAudioProcessor::getFFTData(int index) const {
     return fftData[index];
-}
-
-void AudioPluginAudioProcessor::pushNextSampleIntoFifo(const float& sample)
-{
-    if (fifoIndex == fftSize)
-    {
-            if (!nextFFTBlockReady)
-            {
-                fftData.fill(0.f);
-                std::copy_n(fifo.begin(), fifo.size(), fftData.begin());
-                nextFFTBlockReady = true;
-            }
-            fifoIndex = 0;
-        }
-        fifo[fifoIndex++] = sample;
 }
 
 //==============================================================================

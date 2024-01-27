@@ -50,8 +50,6 @@ public:
     static constexpr int scopeSize = 1 << 12;
 
     //==============================================================================
-    bool isNextFFTBlockReady() const;
-    void nextFFTBlockReadyReset();
     void processFFTData();
     float getFFTData(int index) const;
 private:
@@ -59,15 +57,12 @@ private:
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
     
-    //NOTE: use circular buffer, this is ass...
-    std::array<float, fftSize> fifo;
+    //TODO: integrate with LockFreeBuffer
+    powder::LockFreeBufferFixed<float, 2 * fftSize> lockFreeBuffer;
     std::array<float, 2 * fftSize> fftData;
-    size_t fifoIndex;
-    bool nextFFTBlockReady;
 
     juce::AudioBuffer<float> sumBuffer;
 
-    void pushNextSampleIntoFifo(const float& sample);
     //==============================================================================
     #if PERFETTO
         std::unique_ptr<perfetto::TracingSession> tracingSession;

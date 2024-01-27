@@ -1,7 +1,9 @@
 {
     "cmake.configureArgs": [
+        "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",
         "-DJUCE_BUILD_EXTRAS=OFF",
         "-DJUCE_BUILD_EXAMPLES=OFF",
+        // "-DPERFETTO=ON",
     ],
     "C_Cpp.intelliSenseEngine": "default",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",

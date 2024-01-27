@@ -4,8 +4,8 @@
 FFTSpectrum::FFTSpectrum(AudioPluginAudioProcessor& p)
     : processorRef(p)
     , scopeData{}
-{
-    startTimerHz(60);
+{   
+    startTimerHz(30);
 }
 
 FFTSpectrum::~FFTSpectrum() {}
@@ -33,27 +33,24 @@ void FFTSpectrum::paint(juce::Graphics& g) {
 void FFTSpectrum::resized() { /*TODO*/ }
 
 void FFTSpectrum::timerCallback() {
-    if (processorRef.isNextFFTBlockReady()) {
-        processorRef.processFFTData();
+    processorRef.processFFTData();
 
-        auto minDB = -100.f;
-        auto maxDB = 0.f;
+    auto minDB = -100.f;
+    auto maxDB = 0.f;
 
-        for (int i = 0; i < scopeSize; ++i) {
-            auto skewedProportionX = 1.f - std::exp(std::log(1.f - (float) i / (float) scopeSize) * 0.2f);
-            auto fftDataIndex = juce::jlimit(0, (int)fftSize / 2, (int)(skewedProportionX * (float) fftSize * 0.5f));
-            auto level = juce::jmap(
-                juce::jlimit(
-                    minDB, maxDB,
-                    juce::Decibels::gainToDecibels(processorRef.getFFTData(fftDataIndex)) - juce::Decibels::gainToDecibels((float) fftSize)
-                ),
-                minDB, maxDB, 0.f, 1.f
-            );
+    for (int i = 0; i < scopeSize; ++i) {
+        auto skewedProportionX = 1.f - std::exp(std::log(1.f - (float) i / (float) scopeSize) * 0.2f);
+        auto fftDataIndex = juce::jlimit(0, (int)fftSize / 2, (int)(skewedProportionX * (float) fftSize * 0.5f));
+        auto level = juce::jmap(
+            juce::jlimit(
+                minDB, maxDB,
+                juce::Decibels::gainToDecibels(processorRef.getFFTData(fftDataIndex)) - juce::Decibels::gainToDecibels((float) fftSize)
+            ),
+            minDB, maxDB, 0.f, 1.f
+        );
 
-            scopeData[i] = level;
-        }
-
-        processorRef.nextFFTBlockReadyReset();
-        repaint();
+        scopeData[i] = level;
     }
+
+    repaint();
 }
