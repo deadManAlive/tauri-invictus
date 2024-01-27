@@ -5,7 +5,7 @@
         "-DJUCE_BUILD_EXAMPLES=OFF",
         // "-DPERFETTO=ON",
     ],
-    "C_Cpp.intelliSenseEngine": "default",
+    "C_Cpp.intelliSenseEngine": "disabled",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.default.cppStandard": "c++20",
 }
