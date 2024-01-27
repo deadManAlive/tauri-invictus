@@ -33,6 +33,10 @@ namespace powder {
                 std::copy_n(myBuffer + scope.startIndex2, scope.blockSize2, someData+scope.blockSize1);
             }
         }
+
+        void clear() {
+            abstractFifo.reset();
+        }
     private:
         juce::AbstractFifo abstractFifo;
         T myBuffer[SIZE];

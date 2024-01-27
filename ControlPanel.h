@@ -6,7 +6,7 @@ class ControlPanel : public juce::Component
 {
 public:
     ControlPanel(AudioPluginAudioProcessor& p);
-    ~ControlPanel();
+    ~ControlPanel() override;
     void paint(juce::Graphics& g) override;
     void resized() override;
 private:

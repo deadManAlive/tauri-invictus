@@ -7,7 +7,7 @@ class FFTSpectrum : public juce::Component, public juce::Timer
 public:
     //==============================================================================
     FFTSpectrum(AudioPluginAudioProcessor& p);
-    ~FFTSpectrum();
+    ~FFTSpectrum() override;
     void paint(juce::Graphics& g) override;
     void resized() override;
     void timerCallback() override;

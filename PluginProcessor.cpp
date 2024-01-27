@@ -11,9 +11,9 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
-     , fftData{}
      , forwardFFT(fftOrder)
      , window(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
+     , fftData()
 {
     #if PERFETTO
         MelatoninPerfetto::get().beginSession();
@@ -98,6 +98,9 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused (sampleRate);
+
+    lockFreeBuffer.clear();
+    fftData.fill(0.f);
 
     sumBuffer.setSize(1, samplesPerBlock);
 }
@@ -204,7 +207,7 @@ void AudioPluginAudioProcessor::processFFTData() {
 }
 
 float AudioPluginAudioProcessor::getFFTData(int index) const {
-    return fftData[index];
+    return fftData[(size_t)index];
 }
 
 //==============================================================================
