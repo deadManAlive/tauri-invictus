@@ -52,6 +52,9 @@ public:
     //==============================================================================
     void processFFTData();
     float getFFTData(int index) const;
+
+    //==============================================================================
+    std::atomic<float>* skewValue = nullptr;
 private:
     //==============================================================================
     juce::dsp::FFT forwardFFT;
@@ -63,6 +66,11 @@ private:
 
     juce::AudioBuffer<float> sumBuffer;
 
+    //==============================================================================
+    juce::AudioProcessorValueTreeState apvts;
+
+    //==============================================================================
+    
     //==============================================================================
     #if PERFETTO
         std::unique_ptr<perfetto::TracingSession> tracingSession;

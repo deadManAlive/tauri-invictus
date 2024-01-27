@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <memory>
 
 //==============================================================================
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
@@ -14,10 +15,15 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
      , forwardFFT(fftOrder)
      , window(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
      , fftData()
+     , apvts(*this, nullptr, juce::Identifier("Parameters"), {
+        std::make_unique<juce::AudioParameterFloat>("skew", "Skew", 0.001f, 1.0f, 0.036f)
+     })
 {
     #if PERFETTO
         MelatoninPerfetto::get().beginSession();
     #endif
+
+    skewValue = apvts.getRawParameterValue("skew");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -181,7 +187,7 @@ bool AudioPluginAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
 {
-    return new AudioPluginAudioProcessorEditor (*this);
+    return new AudioPluginAudioProcessorEditor (*this, apvts);
 }
 
 //==============================================================================

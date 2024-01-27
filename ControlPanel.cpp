@@ -1,15 +1,22 @@
 #include "ControlPanel.h"
 
-ControlPanel::ControlPanel(AudioPluginAudioProcessor& p)
-    : processorRef(p) {}
+ControlPanel::ControlPanel(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
+    : processorRef(p)
+    , parameters(apvts)
+    , skewSlider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow)
+{
+    skewSlider.setSkewFactorFromMidPoint(0.036f);
+    addAndMakeVisible(skewSlider);
+    skewAttachment.reset(new SliderAttachment(parameters, "skew", skewSlider));
+}
 
 ControlPanel::~ControlPanel() {}
 
 void ControlPanel::paint(juce::Graphics& g) {
-    g.fillAll(juce::Colours::white);
-    g.setColour (juce::Colours::red);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello, World!!", getLocalBounds(), juce::Justification::centred, 1);
+    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
-void ControlPanel::resized() {}
+void ControlPanel::resized() {
+    auto r = getLocalBounds();
+    skewSlider.setBounds(r);
+}
