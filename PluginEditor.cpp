@@ -5,7 +5,7 @@
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : AudioProcessorEditor (&p)
     , processorRef (p)
-    , fftSpectrum (processorRef)
+    , fftSpectrum (processorRef, apvts)
     , controlPanel (processorRef, apvts)
 {
     // Make sure that before the constructor has finished, you've set the

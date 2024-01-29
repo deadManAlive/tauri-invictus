@@ -1,8 +1,10 @@
 #include "FFTComponent.h"
 #include "PluginProcessor.h"
+#include <cmath>
 
-FFTSpectrum::FFTSpectrum(AudioPluginAudioProcessor& p)
+FFTSpectrum::FFTSpectrum(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : processorRef(p)
+    , parameters(apvts)
     , scopeData{}
 {   
     startTimerHz(30);
@@ -21,7 +23,6 @@ void FFTSpectrum::paint(juce::Graphics& g) {
         auto width = getLocalBounds().getWidth();
         auto height = getLocalBounds().getHeight();
 
-        // TODO: doing this log in runtime is stupid
         g.drawLine({
             (float) juce::jmap (i - 1, 0, scopeSize - 1, 0, width),
             juce::jmap (scopeData[(size_t) i - 1], 0.0f, 1.0f, (float) height, 0.0f),
@@ -36,18 +37,22 @@ void FFTSpectrum::timerCallback() {
     if (isShowing()) {
         processorRef.processFFTData();
 
-        auto minDB = -100.f;
-        auto maxDB = 0.f;
+        const auto minDB = -120.f;
+        const auto maxDB = 0.f;
+        const auto analyzerMaxDB = 1.f;
+        const auto levelFactor = 1.f / (pow(10.f, analyzerMaxDB / 20.f));
+
+        auto skewValue = (parameters.getRawParameterValue("skew"));
 
         for (int i = 0; i < scopeSize; ++i) {
-            auto skewedProportionX = 1.f - std::exp(std::log(1.f - (float) i / (float) scopeSize) * 0.036f);
+            auto skewedProportionX = 1.f - std::exp(std::log(1.f - (float) i / (float) scopeSize) * (*skewValue));
             auto fftDataIndex = juce::jlimit(0, (int)fftSize / 2, (int)(skewedProportionX * (float) fftSize * 0.5f));
             auto level = juce::jmap(
                 juce::jlimit(
                     minDB, maxDB,
                     juce::Decibels::gainToDecibels(processorRef.getFFTData(fftDataIndex)) - juce::Decibels::gainToDecibels((float) fftSize)
                 ),
-                minDB, maxDB, 0.f, 1.f
+                minDB, maxDB, 0.f, levelFactor
             );
 
             scopeData[(size_t) i] = level;

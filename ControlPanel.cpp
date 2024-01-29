@@ -5,7 +5,6 @@ ControlPanel::ControlPanel(AudioPluginAudioProcessor& p, AudioProcessorValueTree
     , parameters(apvts)
     , skewSlider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow)
 {
-    skewSlider.setSkewFactorFromMidPoint(0.036f);
     addAndMakeVisible(skewSlider);
     skewAttachment.reset(new SliderAttachment(parameters, "skew", skewSlider));
 }

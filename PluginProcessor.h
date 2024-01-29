@@ -54,6 +54,9 @@ public:
     float getFFTData(int index) const;
 
     //==============================================================================
+    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    //==============================================================================
     std::atomic<float>* skewValue = nullptr;
 private:
     //==============================================================================
@@ -61,7 +64,7 @@ private:
     juce::dsp::WindowingFunction<float> window;
     
     //TODO: integrate with LockFreeBuffer
-    powder::LockFreeBufferFixed<float, 2 * fftSize> lockFreeBuffer;
+    powder::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
     std::array<float, 2 * fftSize> fftData;
 
     juce::AudioBuffer<float> sumBuffer;

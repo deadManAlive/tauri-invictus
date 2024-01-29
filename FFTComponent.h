@@ -6,7 +6,7 @@ class FFTSpectrum : public juce::Component, public juce::Timer
 {
 public:
     //==============================================================================
-    FFTSpectrum(AudioPluginAudioProcessor& p);
+    FFTSpectrum(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts);
     ~FFTSpectrum() override;
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -19,6 +19,9 @@ private:
     static constexpr auto fftOrder = AudioPluginAudioProcessor::fftOrder;
     static constexpr auto fftSize = AudioPluginAudioProcessor::fftSize;
     static constexpr auto scopeSize = AudioPluginAudioProcessor::scopeSize;
+
+    //==============================================================================
+    AudioProcessorValueTreeState& parameters;
 
     //==============================================================================
     std::array<float, scopeSize> scopeData;

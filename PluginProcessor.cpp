@@ -15,9 +15,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
      , forwardFFT(fftOrder)
      , window(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
      , fftData()
-     , apvts(*this, nullptr, juce::Identifier("Parameters"), {
-        std::make_unique<juce::AudioParameterFloat>("skew", "Skew", 0.001f, 1.0f, 0.036f)
-     })
+     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
     #if PERFETTO
         MelatoninPerfetto::get().beginSession();
@@ -207,13 +205,25 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 void AudioPluginAudioProcessor::processFFTData() {
-    lockFreeBuffer.readFromFifo(fftData.data(), fftSize);
+    lockFreeBuffer.readFromFifo(fftData.data(), 2 * fftSize);
     window.multiplyWithWindowingTable(fftData.data(), fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftData.data());
 }
 
 float AudioPluginAudioProcessor::getFFTData(int index) const {
     return fftData[(size_t)index];
+}
+
+AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
+    AudioProcessorValueTreeState::ParameterLayout parameterLayout;
+
+    // FREQUENCY SKEW
+    const float defaultSkew = 0.036f;
+    NormalisableRange<float> nrange(0.001f, 1.0f, 0.001f);
+    nrange.setSkewForCentre(defaultSkew);
+    parameterLayout.add(std::make_unique<juce::AudioParameterFloat>("skew", "Skew", nrange, defaultSkew));
+
+    return parameterLayout;
 }
 
 //==============================================================================
