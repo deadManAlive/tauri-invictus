@@ -13,7 +13,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(fftSpectrum);
     addAndMakeVisible(controlPanel);
 
-    double ratio = 24.0/9.0;
+    double ratio = 32.0/9.0;
     int min_height = 400;
     int max_height = 1600;
     int default_size = 600;

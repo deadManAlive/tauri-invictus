@@ -37,7 +37,7 @@ void FFTSpectrum::resized() { /*TODO*/ }
 void FFTSpectrum::timerCallback() {
     if (processorRef.getBufferFreeSpace() == 0) {
         // TODO: current structure READ BY DEQUEUEING, hence discontinuous data across windows. WE DO NOT WANT that.
-        processorRef.processFFTData();
+        processorRef.processFftData();
 
         const auto minDB = -90.f;
         const auto maxDB = 0.f;
@@ -52,7 +52,7 @@ void FFTSpectrum::timerCallback() {
             auto level = juce::jmap(
                 juce::jlimit(
                     minDB, maxDB,
-                    juce::Decibels::gainToDecibels(processorRef.getFFTData(fftDataIndex)) - juce::Decibels::gainToDecibels((float) fftSize)
+                    juce::Decibels::gainToDecibels(processorRef.getFftData(fftDataIndex)) - juce::Decibels::gainToDecibels((float) fftSize)
                 ),
                 minDB, maxDB, 0.f, levelFactor
             );
