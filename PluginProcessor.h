@@ -48,8 +48,7 @@ public:
     //==============================================================================
     static constexpr int fftOrder = 11;
     static constexpr int fftSize = 1 << fftOrder;
-    static constexpr int scopeSize = 1 << 6;
-    static constexpr float smoothingTimeConstant = 0.8f;
+    static constexpr int scopeSize = 1 << 7;
 
     //==============================================================================
     void processFftData();
@@ -63,6 +62,7 @@ public:
 
     //==============================================================================
     std::atomic<float>* skewValue = nullptr;
+    std::atomic<float>* smoothingConstantValue = nullptr;
 private:
     //==============================================================================
     juce::dsp::FFT forwardFFT;

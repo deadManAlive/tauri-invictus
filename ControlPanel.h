@@ -19,5 +19,8 @@ private:
     Slider skewSlider;
     std::unique_ptr<SliderAttachment> skewAttachment;
 
+    Slider smoothingSlider;
+    std::unique_ptr<SliderAttachment> smoothingAttachment;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlPanel)
 };

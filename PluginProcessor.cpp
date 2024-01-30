@@ -23,6 +23,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     #endif
 
     skewValue = apvts.getRawParameterValue("skew");
+    smoothingConstantValue = apvts.getRawParameterValue("smoothing");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -210,8 +211,10 @@ void AudioPluginAudioProcessor::processFftData() {
     window.multiplyWithWindowingTable(fftData.data(), fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftData.data());
 
-    FloatVectorOperations::multiply(smoothedBlock.data(), smoothingTimeConstant, 2 * fftSize);
-    FloatVectorOperations::addWithMultiply(smoothedBlock.data(), fftData.data(), smoothingTimeConstant, 2 * fftSize);
+    const auto smoothingConstant = smoothingConstantValue->load();
+
+    FloatVectorOperations::multiply(smoothedBlock.data(), smoothingConstant, 2 * fftSize);
+    FloatVectorOperations::addWithMultiply(smoothedBlock.data(), fftData.data(), (1 - smoothingConstant), 2 * fftSize);
 }
 
 float AudioPluginAudioProcessor::getFftData(int index) const {
@@ -230,6 +233,10 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
     NormalisableRange<float> nrange(0.001f, 1.0f, 0.0001f);
     nrange.setSkewForCentre(defaultSkew);
     parameterLayout.add(std::make_unique<juce::AudioParameterFloat>("skew", "Skew", nrange, defaultSkew));
+
+    // SPECTRUM SMOOTHING TIME CONSTANT
+    NormalisableRange<float> trange(0.f, 1.f, 0.001f);
+    parameterLayout.add(std::make_unique<juce::AudioParameterFloat>("smoothing", "Smoothing Constant", trange, 0.8f));
 
     return parameterLayout;
 }
