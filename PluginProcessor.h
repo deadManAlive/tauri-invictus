@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <array>
 
 #include "LockFreeBuffer.h"
 
@@ -48,10 +49,13 @@ public:
     static constexpr int fftOrder = 11;
     static constexpr int fftSize = 1 << fftOrder;
     static constexpr int scopeSize = 1 << 6;
+    static constexpr float smoothingTimeConstant = 0.8f;
 
     //==============================================================================
-    void processFFTData();
-    float getFFTData(int index) const;
+    void processFftData();
+    float getFftData(int index) const;
+
+    //==============================================================================
     int getBufferFreeSpace() const;
 
     //==============================================================================
@@ -66,7 +70,11 @@ private:
     
     //TODO: integrate with LockFreeBuffer
     powder::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
-    std::array<float, 2 * fftSize> fftData;
+
+    //==============================================================================
+    using FftContainerType = std::array<float, 2 * fftSize>;
+    FftContainerType fftData;
+    FftContainerType smoothedBlock;
 
     juce::AudioBuffer<float> sumBuffer;
 

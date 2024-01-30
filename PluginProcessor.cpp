@@ -15,6 +15,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
      , forwardFFT(fftOrder)
      , window(fftSize, juce::dsp::WindowingFunction<float>::blackmanHarris)
      , fftData()
+     , smoothedBlock()
      , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
     #if PERFETTO
@@ -204,14 +205,17 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
     juce::ignoreUnused (data, sizeInBytes);
 }
 
-void AudioPluginAudioProcessor::processFFTData() {
+void AudioPluginAudioProcessor::processFftData() {
     lockFreeBuffer.readFromFifo(fftData.data(), fftSize);
     window.multiplyWithWindowingTable(fftData.data(), fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftData.data());
+
+    FloatVectorOperations::multiply(smoothedBlock.data(), smoothingTimeConstant, 2 * fftSize);
+    FloatVectorOperations::addWithMultiply(smoothedBlock.data(), fftData.data(), smoothingTimeConstant, 2 * fftSize);
 }
 
-float AudioPluginAudioProcessor::getFFTData(int index) const {
-    return fftData[(size_t)index];
+float AudioPluginAudioProcessor::getFftData(int index) const {
+    return smoothedBlock[(size_t)index];
 }
 
 int AudioPluginAudioProcessor::getBufferFreeSpace() const {
