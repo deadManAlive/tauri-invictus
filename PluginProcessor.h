@@ -45,13 +45,14 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    static constexpr int fftOrder = 10;
+    static constexpr int fftOrder = 11;
     static constexpr int fftSize = 1 << fftOrder;
-    static constexpr int scopeSize = 1 << 12;
+    static constexpr int scopeSize = 1 << 6;
 
     //==============================================================================
     void processFFTData();
     float getFFTData(int index) const;
+    int getBufferFreeSpace() const;
 
     //==============================================================================
     AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -34,6 +34,10 @@ namespace powder {
             }
         }
 
+        int getFreeSpace() const {
+            return abstractFifo.getFreeSpace();
+        }
+
         void clear() {
             abstractFifo.reset();
         }

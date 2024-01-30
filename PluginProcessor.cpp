@@ -205,7 +205,7 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 void AudioPluginAudioProcessor::processFFTData() {
-    lockFreeBuffer.readFromFifo(fftData.data(), 2 * fftSize);
+    lockFreeBuffer.readFromFifo(fftData.data(), fftSize);
     window.multiplyWithWindowingTable(fftData.data(), fftSize);
     forwardFFT.performFrequencyOnlyForwardTransform(fftData.data());
 }
@@ -214,12 +214,16 @@ float AudioPluginAudioProcessor::getFFTData(int index) const {
     return fftData[(size_t)index];
 }
 
+int AudioPluginAudioProcessor::getBufferFreeSpace() const {
+    return lockFreeBuffer.getFreeSpace();
+}
+
 AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
     AudioProcessorValueTreeState::ParameterLayout parameterLayout;
 
     // FREQUENCY SKEW
     const float defaultSkew = 0.036f;
-    NormalisableRange<float> nrange(0.001f, 1.0f, 0.001f);
+    NormalisableRange<float> nrange(0.001f, 1.0f, 0.0001f);
     nrange.setSkewForCentre(defaultSkew);
     parameterLayout.add(std::make_unique<juce::AudioParameterFloat>("skew", "Skew", nrange, defaultSkew));
 
