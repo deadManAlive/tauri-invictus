@@ -1,5 +1,6 @@
 #include "FFTComponent.h"
 #include "PluginProcessor.h"
+#include "melatonin_perfetto/melatonin_perfetto.h"
 #include <cmath>
 
 FFTSpectrum::FFTSpectrum(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
@@ -15,9 +16,9 @@ FFTSpectrum::~FFTSpectrum() {}
 void FFTSpectrum::paint(juce::Graphics& g) {
     TRACE_COMPONENT();
 
-    g.fillAll(juce::Colours::black);
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     g.setOpacity(1.0f);
-    g.setColour(juce::Colours::white);
+    g.setColour(Colours::whitesmoke);
 
     auto width = getLocalBounds().getWidth();
     auto height = getLocalBounds().getHeight();
@@ -32,11 +33,12 @@ void FFTSpectrum::paint(juce::Graphics& g) {
     }
 }
 
-void FFTSpectrum::resized() { /*TODO*/ }
+void FFTSpectrum::resized() {}
 
 void FFTSpectrum::timerCallback() {
+    TRACE_COMPONENT();
+
     if (processorRef.getBufferFreeSpace() == 0) {
-        // TODO: current structure READ BY DEQUEUEING, hence discontinuous data across windows. WE DO NOT WANT that.
         processorRef.processFftData();
 
         const auto minDB = -90.f;
@@ -46,6 +48,8 @@ void FFTSpectrum::timerCallback() {
 
         auto skewValue = (parameters.getRawParameterValue("skew"));
 
+
+        // TODO: this method isn't efficient (probably), make one bin per one coordinate.
         for (int i = 0; i < scopeSize; ++i) {
             auto skewedProportionX = 1.f - std::exp(std::log(1.f - (float) i / (float) scopeSize) * (*skewValue));
             auto fftDataIndex = juce::jlimit(0, (int)fftSize / 2, (int)(skewedProportionX * (float) fftSize * 0.5f));

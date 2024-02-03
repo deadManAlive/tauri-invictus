@@ -16,7 +16,7 @@ ControlPanel::ControlPanel(AudioPluginAudioProcessor& p, AudioProcessorValueTree
 ControlPanel::~ControlPanel() {}
 
 void ControlPanel::paint(juce::Graphics& g) {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 }
 
 void ControlPanel::resized() {

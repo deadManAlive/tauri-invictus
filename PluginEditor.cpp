@@ -30,7 +30,7 @@ AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (Colours::black);
 
 }
 
@@ -38,17 +38,20 @@ void AudioPluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    juce::Grid grid;
+    Grid grid;
+    
+    using Track = Grid::TrackInfo;
+    using Fr = Grid::Fr;
+    using Px = Grid::Px;
 
-    using Track = juce::Grid::TrackInfo;
-    using Fr = juce::Grid::Fr;
+    grid.setGap(Px{8});
 
     grid.templateRows = {Track(Fr(1))};
     grid.templateColumns = {Track(Fr(1)), Track(Fr(3))};
 
     grid.items = {
-        juce::GridItem (controlPanel),
-        juce::GridItem (fftSpectrum)
+        GridItem (controlPanel),
+        GridItem (fftSpectrum)
     };
 
     grid.performLayout (getLocalBounds());

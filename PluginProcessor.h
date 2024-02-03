@@ -48,7 +48,7 @@ public:
     //==============================================================================
     static constexpr int fftOrder = 11;
     static constexpr int fftSize = 1 << fftOrder;
-    static constexpr int scopeSize = 1 << 7;
+    static constexpr int scopeSize = 1 << 6;
 
     //==============================================================================
     void processFftData();
@@ -68,7 +68,6 @@ private:
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
     
-    //TODO: integrate with LockFreeBuffer
     powder::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
 
     //==============================================================================
