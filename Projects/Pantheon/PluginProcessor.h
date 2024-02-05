@@ -1,12 +1,9 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include <array>
-
-#include "LockFreeBuffer.h"
 
 //==============================================================================
-class AudioPluginAudioProcessor final : public juce::AudioProcessor
+class AudioPluginAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -46,47 +43,30 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    static constexpr int fftOrder = 11;
-    static constexpr int fftSize = 1 << fftOrder;
-    static constexpr int scopeSize = 1 << 6;
-
-    //==============================================================================
-    void processFftData();
-    float getFftData(int index) const;
-
-    //==============================================================================
-    int getBufferFreeSpace() const;
-
-    //==============================================================================
-    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-
-    //==============================================================================
-    std::atomic<float>* skewValue = nullptr;
-    std::atomic<float>* smoothingConstantValue = nullptr;
+    void setLeftPreGain(float newValue);
+    void setRightPreGain(float newValue);
+    void setLeftToRightGain(float newValue);
+    void setRightToLeftGain(float newValue);
+    void setLeftPan(float newValue);
+    void setRightPan(float newValue);
 private:
     //==============================================================================
-    juce::dsp::FFT forwardFFT;
-    juce::dsp::WindowingFunction<float> window;
-    
-    powder::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
-
+    juce::AudioParameterFloat* mainPan; // -1.0 -- 1.0, default at 0, mL = 1-mainPan, mR = 1 + mainPan
+    juce::AudioParameterFloat* leftPreGain;
+    juce::AudioParameterFloat* rightPreGain;
+    juce::AudioParameterFloat* leftToRightGain;
+    juce::AudioParameterFloat* rightToLeftGain;
+    juce::AudioParameterFloat* leftPan; //default -1.0 / full left
+    juce::AudioParameterFloat* rightPan; //default 1.0 / full right
     //==============================================================================
-    using FftContainerType = std::array<float, 2 * fftSize>;
-    FftContainerType fftData;
-    FftContainerType smoothedBlock;
-
-    juce::AudioBuffer<float> sumBuffer;
-
-    //==============================================================================
-    juce::AudioProcessorValueTreeState apvts;
-
-    //==============================================================================
-    
-    //==============================================================================
-    #if PERFETTO
-        std::unique_ptr<perfetto::TracingSession> tracingSession;
-    #endif
-
+    float prevLeftPreGain;
+    float prevRightPreGain;
+    float prevLeftToRightGain;
+    float prevRightToLeftGain;
+    float prevLeftPostGain;
+    float prevRightPostGain;
+    float prevLeftToRightPostGain;
+    float prevRightToLeftPostGain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };
