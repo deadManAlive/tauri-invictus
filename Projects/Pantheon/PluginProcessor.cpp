@@ -265,29 +265,15 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         r2lPostGain = -rPan;
     }
 
-    // float lPreGainStep = (lPreGain - prevLeftPreGain)/sampleNum;
-    // float rPreGainStep = (rPreGain - prevLeftPreGain)/sampleNum;
-    // float l2rGainStep = (l2rGain - prevLeftToRightGain)/sampleNum;
-    // float r2lGainStep = (r2lGain - prevRightToLeftGain)/sampleNum;
-    // float lPostGainStep = (lPostGain - prevLeftPostGain)/sampleNum;
-    // float rPostGainStep = (rPostGain - prevRightPostGain)/sampleNum;
-    // float l2rPostGainStep = (l2rPostGain - prevLeftToRightPostGain)/sampleNum;
-    // float r2lPostGainStep = (r2lPostGain - prevRightToLeftPostGain)/sampleNum;
-
     for(int i = 0; i < buffer.getNumSamples(); i++){
         auto currentLeftSample = leftChannel[i];
         auto currentRightSample = rightChannel[i];
 
-        // leftChannel[i] = lPreGain*currentLeftSample + r2lGain*currentRightSample;
-        // rightChannel[i] = rPreGain*currentRightSample + l2rGain*currentLeftSample;
         leftChannel[i] = gainRamp(prevLeftPreGain, lPreGain, sampleNum)*currentLeftSample + gainRamp(prevRightToLeftGain, r2lGain, sampleNum)*currentRightSample;
         rightChannel[i] = gainRamp(prevRightPreGain, rPreGain, sampleNum)*currentRightSample + gainRamp(prevLeftToRightGain, l2rGain, sampleNum)*currentLeftSample;
 
         currentLeftSample = leftChannel[i];
         currentRightSample = rightChannel[i];
-
-        // leftChannel[i] = lPostGain*currentLeftSample + r2lPostGain*currentRightSample;
-        // rightChannel[i] = rPostGain*currentRightSample + l2rPostGain*currentLeftSample;
 
         leftChannel[i] = gainRamp(prevLeftPostGain, lPostGain, sampleNum)*currentLeftSample + gainRamp(prevRightToLeftPostGain, r2lPostGain, sampleNum)*currentRightSample;
         rightChannel[i] = gainRamp(prevRightPostGain, rPostGain, sampleNum)*currentRightSample + gainRamp(prevLeftToRightPostGain, l2rPostGain, sampleNum)*currentLeftSample;
@@ -325,7 +311,7 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 {
     std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
     if(xml.get() != nullptr){
-        if(xml->hasTagName("pantheonparameterXML")){
+        if(xml->hasTagName("pantheonParameterXML")){
             *leftPreGain = (float)xml->getDoubleAttribute("leftpregain", 1.0f);
             *rightPreGain = (float)xml->getDoubleAttribute("rightpregain", 1.0f);
             *leftToRightGain = (float)xml->getDoubleAttribute("lefttorightgain", 0.0f);
