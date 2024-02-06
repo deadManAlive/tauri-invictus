@@ -43,6 +43,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
+    AudioProcessorValueTreeState::ParameterLayout createParameterLayout(); //TODO: tidy these nasty stuff
+
+    //==============================================================================
     void setLeftPreGain(float newValue);
     void setRightPreGain(float newValue);
     void setLeftToRightGain(float newValue);
@@ -51,13 +54,14 @@ public:
     void setRightPan(float newValue);
 private:
     //==============================================================================
-    juce::AudioParameterFloat* mainPan; // -1.0 -- 1.0, default at 0, mL = 1-mainPan, mR = 1 + mainPan
-    juce::AudioParameterFloat* leftPreGain;
-    juce::AudioParameterFloat* rightPreGain;
-    juce::AudioParameterFloat* leftToRightGain;
-    juce::AudioParameterFloat* rightToLeftGain;
-    juce::AudioParameterFloat* leftPan; //default -1.0 / full left
-    juce::AudioParameterFloat* rightPan; //default 1.0 / full right
+    juce::AudioParameterFloat* mainPan = nullptr; // -1.0 -- 1.0, default at 0, mL = 1-mainPan, mR = 1 + mainPan
+    juce::AudioParameterFloat* leftPreGain = nullptr;
+    juce::AudioParameterFloat* rightPreGain = nullptr;
+    juce::AudioParameterFloat* leftToRightGain = nullptr;
+    juce::AudioParameterFloat* rightToLeftGain = nullptr;
+    juce::AudioParameterFloat* leftPan = nullptr; //default -1.0 / full left
+    juce::AudioParameterFloat* rightPan = nullptr; //default 1.0 / full right
+
     //==============================================================================
     float prevLeftPreGain;
     float prevRightPreGain;
@@ -67,6 +71,16 @@ private:
     float prevRightPostGain;
     float prevLeftToRightPostGain;
     float prevRightToLeftPostGain;
+
+    //==============================================================================
+    LinearSmoothedValue<float> mainGain { 0.f };
+
+    //==============================================================================
+    AudioProcessorValueTreeState apvts;
+
+    //==============================================================================
+    std::atomic<float>* mainGainValue = nullptr;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

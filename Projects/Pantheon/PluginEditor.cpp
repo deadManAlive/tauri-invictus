@@ -2,10 +2,12 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
+    : AudioProcessorEditor (&p)
+    , processorRef(p)
+    , parameters(apvts)
+    , mainGainSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
 {
-    // juce::ignoreUnused (processorRef);
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     startTimerHz(30);
@@ -73,6 +75,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(leftPanSlider);
     addAndMakeVisible(rightPanSlider);
 
+    addAndMakeVisible(mainGainSlider);
+    mainGainAttachment.reset(new SliderAttachment(parameters, "mainGain", mainGainSlider));
+
     setResizable(false, false);
 }
 
@@ -91,9 +96,11 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawRect(44, 185, 14, 310);
     g.drawRect(358, 185, 14, 310);
     g.drawRect(46, 577, 328, 14);
-    g.drawEllipse(179, 97, 60, 60, 1);
+    // g.drawEllipse(179, 97, 60, 60, 1);
 }
 
+
+//TODO: use grid / flexbox
 void AudioPluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
@@ -104,6 +111,7 @@ void AudioPluginAudioProcessorEditor::resized()
     l2rGainSlider.setBounds(274, 185, 14, 310);
     leftPanSlider.setBounds(44, 529, 140, 14);
     rightPanSlider.setBounds(232, 529, 140, 14);
+    mainGainSlider.setBounds(179, 97, 60, 60);
 }
 
 void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider){

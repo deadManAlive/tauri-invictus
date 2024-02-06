@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <memory>
 
 //==============================================================================
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
@@ -11,6 +12,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
+    , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
     addParameter(
         leftPreGain = new juce::AudioParameterFloat(
@@ -66,6 +68,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
             1.0f
         )
     );
+
+    mainGainValue = apvts.getRawParameterValue("mainGain");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -142,7 +146,10 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    mainGain.reset(sampleRate, 0.5 / sampleRate);
+    
+    juce::ignoreUnused (samplesPerBlock);
+
     prevLeftPreGain = *leftPreGain;
     prevRightPreGain = *rightPreGain;
     prevLeftToRightGain = *leftToRightGain;
@@ -229,7 +236,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    //==================MODEL1=======================================================
     auto* leftChannel = buffer.getWritePointer(0);
     auto* rightChannel = buffer.getWritePointer(1);
 
@@ -278,9 +284,11 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         leftChannel[i] = gainRamp(prevLeftPostGain, lPostGain, sampleNum)*currentLeftSample + gainRamp(prevRightToLeftPostGain, r2lPostGain, sampleNum)*currentRightSample;
         rightChannel[i] = gainRamp(prevRightPostGain, rPostGain, sampleNum)*currentRightSample + gainRamp(prevLeftToRightPostGain, l2rPostGain, sampleNum)*currentLeftSample;
     }
-    //==================MODEL2=======================================================
-    //process as buffer to apply gainRamp to to smooth gain change, or implement
-    //own gain ramp to model 1(?)
+
+    auto mg = apvts.getRawParameterValue("mainGain")->load();
+    mainGain.setTargetValue(mg);
+
+    buffer.applyGain(mainGain.getNextValue());
 }
 
 //==============================================================================
@@ -291,7 +299,7 @@ bool AudioPluginAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
 {
-    return new AudioPluginAudioProcessorEditor (*this);
+    return new AudioPluginAudioProcessorEditor (*this, apvts);
 }
 
 //==============================================================================
@@ -321,6 +329,86 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
         }
     }
 }
+
+AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
+    AudioProcessorValueTreeState::ParameterLayout parameterLayout;
+
+    //TODO: this
+    /**
+    // LEFT PRE-GAIN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "leftPreGain",
+            "Left Pre Gain",
+            NormalisableRange<float>{-2.f, 2.f},
+            1.f
+        )
+    );
+    
+    // RIGHT PRE-GAIN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "rightPreGain",
+            "Right Pre Gain",
+            NormalisableRange<float>{-2.f, 2.f},
+            1.f
+        )
+    );
+
+    // LEFT-TO-RIGHT GAIN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "leftToRightGain",
+            "Left-to-Right Gain",
+            NormalisableRange<float>{-2.f, 2.f},
+            0.f
+        )
+    );
+
+    // RIGHT-TO-LEFT GAIN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "righToLeftGain",
+            "Right-to-Left Gain",
+            NormalisableRange<float>{-2.f, 2.f},
+            0.f
+        )
+    );
+
+    // LEFT PAN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "leftPan",
+            "Left Pan",
+            NormalisableRange<float>{-1.f, 1.f},
+            -1.f
+        )
+    );
+
+    // RIGHT PAN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "rightPan",
+            "Right Pan",
+            NormalisableRange<float>{-1.f, 1.f},
+            1.f
+        )
+    );
+    */
+
+    // MAIN GAIN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "mainGain",
+            "Main Gain",
+            NormalisableRange<float>{0.f, 2.f},
+        1.f
+        )
+    );
+    
+    return parameterLayout;
+}
+
 //==============================================================================
 void AudioPluginAudioProcessor::setLeftPreGain(float newValue)
 {
