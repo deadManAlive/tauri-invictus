@@ -59,29 +59,25 @@ public:
 
     //==============================================================================
     AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-
+private:
     //==============================================================================
     std::atomic<float>* skewValue = nullptr;
     std::atomic<float>* smoothingConstantValue = nullptr;
-private:
+    
     //==============================================================================
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
-    
     powder::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
 
     //==============================================================================
     using FftContainerType = std::array<float, 2 * fftSize>;
     FftContainerType fftData;
     FftContainerType smoothedBlock;
-
     juce::AudioBuffer<float> sumBuffer;
 
     //==============================================================================
     juce::AudioProcessorValueTreeState apvts;
 
-    //==============================================================================
-    
     //==============================================================================
     #if PERFETTO
         std::unique_ptr<perfetto::TracingSession> tracingSession;
