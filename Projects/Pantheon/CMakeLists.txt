@@ -19,6 +19,7 @@ target_sources(Pantheon
     MixerComponent.cpp
     PluginEditor.cpp
     PluginProcessor.cpp
+    PreComponent.cpp
 )
 
 target_compile_definitions(Pantheon

@@ -6,20 +6,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     : AudioProcessorEditor (&p)
     , processorRef(p)
     , parameters(apvts)
-    , inputGainSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
-    , inputPanSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
     , mixerComponent(p, apvts)
+    , preComponent(p, apvts)
     , tooltipWindow(this)
 {
-    inputGainSlider.setTooltip("Input Gain");
-    addAndMakeVisible(inputGainSlider);
-    inputGainAttachment.reset(new SliderAttachment(parameters, "inputGain", inputGainSlider));
-
-    inputPanSlider.setTooltip("Input Pan");
-    addAndMakeVisible(inputPanSlider);
-    inputPanAttachment.reset(new SliderAttachment(parameters, "inputPan", inputPanSlider));
-
     addAndMakeVisible(mixerComponent);
+    addAndMakeVisible(preComponent);
 
     double ratio = 2./3.;
     int min_height = 200;
@@ -46,33 +38,20 @@ void AudioPluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    // FlexBox fb;
-    // fb.flexDirection = FlexBox::Direction::column;
-    // fb.flexWrap = FlexBox::Wrap::noWrap;
-
-    // fb.items.add(FlexItem(inputGainSlider).withMinHeight(120.f));
-    // fb.items.add(FlexItem(inputPanSlider).withMinHeight(120.f));
-    // fb.items.add(FlexItem(mixerComponent).withMinHeight(120.f));
-
-    // fb.performLayout(getLocalBounds());
-
     Grid grid;
 
     using Track = Grid::TrackInfo;
     using Fr = Grid::Fr;
 
     grid.templateRows = {
-        Track(Fr(1)),
-        Track(Fr(1)),
+        Track(Fr(2)),
         Track(Fr(3)),
-        Track(Fr(1))
     };
     grid.templateColumns = {Track(Fr(1))};
 
     grid.items = {
-        GridItem(inputGainSlider),
-        GridItem(inputPanSlider),
-        GridItem(mixerComponent)
+        GridItem(preComponent),
+        GridItem(mixerComponent),
     };
 
     grid.performLayout(getLocalBounds());

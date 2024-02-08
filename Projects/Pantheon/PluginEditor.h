@@ -1,10 +1,9 @@
 #pragma once
 
 #include "PluginProcessor.h"
-#include <memory>
 
 #include "MixerComponent.h"
-// #include <memory>
+#include "PreComponent.h"
 // #include "BinaryData.h"
 
 //==============================================================================
@@ -27,14 +26,8 @@ private:
     AudioProcessorValueTreeState& parameters;
     
     //==============================================================================
-    juce::Slider inputGainSlider;
-    std::unique_ptr<SliderAttachment> inputGainAttachment;
-
-    juce::Slider inputPanSlider;
-    std::unique_ptr<SliderAttachment> inputPanAttachment;
-
-    //==============================================================================
     MixerComponent mixerComponent;
+    PreComponent preComponent;
 
     //==============================================================================
     TooltipWindow tooltipWindow;
