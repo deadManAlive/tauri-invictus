@@ -8,10 +8,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     , parameters(apvts)
     , mixerComponent(p, apvts)
     , preComponent(p, apvts)
+    , postComponent(p, apvts)
     , tooltipWindow(this)
 {
-    addAndMakeVisible(mixerComponent);
     addAndMakeVisible(preComponent);
+    addAndMakeVisible(mixerComponent);
+    addAndMakeVisible(postComponent);
 
     double ratio = 2./3.;
     int min_height = 200;
@@ -46,12 +48,14 @@ void AudioPluginAudioProcessorEditor::resized()
     grid.templateRows = {
         Track(Fr(2)),
         Track(Fr(3)),
+        Track(Fr(1)),
     };
     grid.templateColumns = {Track(Fr(1))};
 
     grid.items = {
         GridItem(preComponent),
         GridItem(mixerComponent),
+        GridItem(postComponent),
     };
 
     grid.performLayout(getLocalBounds());

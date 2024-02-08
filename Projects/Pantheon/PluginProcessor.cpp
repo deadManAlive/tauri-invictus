@@ -236,15 +236,13 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         )
     );
 
-    //TODO: this
-    /**
     // LEFT PAN
     parameterLayout.add(
         std::make_unique<AudioParameterFloat>(
             "leftPan",
             "Left Pan",
             NormalisableRange<float>{-1.f, 1.f},
-            -1.f
+            1.f
         )
     );
 
@@ -257,7 +255,6 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
             1.f
         )
     );
-    */
     
     return parameterLayout;
 }

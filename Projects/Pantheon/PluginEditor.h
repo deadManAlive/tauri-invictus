@@ -4,6 +4,7 @@
 
 #include "MixerComponent.h"
 #include "PreComponent.h"
+#include "PostComponent.h"
 // #include "BinaryData.h"
 
 //==============================================================================
@@ -28,6 +29,7 @@ private:
     //==============================================================================
     MixerComponent mixerComponent;
     PreComponent preComponent;
+    PostComponent postComponent;
 
     //==============================================================================
     TooltipWindow tooltipWindow;
