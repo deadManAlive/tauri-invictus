@@ -14,62 +14,6 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
-    addParameter(
-        leftPreGain = new juce::AudioParameterFloat(
-            "lpregain",
-            "Left Gain",
-            -2.0f,
-            2.0f,
-            1.0f
-        )
-    );
-    addParameter(
-        rightPreGain = new juce::AudioParameterFloat(
-            "rpregain",
-            "Right Gain",
-            -2.0f,
-            2.0f,
-            1.0f
-        )
-    );
-    addParameter(
-        leftToRightGain = new juce::AudioParameterFloat(
-            "l2rgain",
-            "Left-to-Right Gain",
-            -2.0f,
-            2.0f,
-            0.0f
-        )
-    );
-    addParameter(
-        rightToLeftGain = new juce::AudioParameterFloat(
-            "r2lgain",
-            "Right-to-Left Gain",
-            -2.0f,
-            2.0f,
-            0.0f
-        )
-    );
-    addParameter(
-        leftPan = new juce::AudioParameterFloat(
-            "leftpan",
-            "Left Pan",
-            -1.0f,
-            1.0f,
-            -1.0f
-        )
-    );
-    addParameter(
-        rightPan = new juce::AudioParameterFloat(
-            "rightpan",
-            "Right Pan",
-            -1.0f,
-            1.0f,
-            1.0f
-        )
-    );
-
-    mainGainValue = apvts.getRawParameterValue("mainGain");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -146,33 +90,9 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    mainGain.reset(sampleRate, 0.5 / sampleRate);
+    InputGain.reset(sampleRate, 0.5 / sampleRate);
     
     juce::ignoreUnused (samplesPerBlock);
-
-    prevLeftPreGain = *leftPreGain;
-    prevRightPreGain = *rightPreGain;
-    prevLeftToRightGain = *leftToRightGain;
-    prevRightToLeftGain = *rightToLeftGain;
-    float prevLeftPan = *leftPan;
-    float prevRightPan = *rightPan;
-    if(prevLeftPan > 0.0f){
-        prevLeftPostGain = prevLeftPan;
-        prevLeftToRightPostGain = 0.0f;
-    }
-    else{
-        prevLeftPostGain = 0.0f;
-        prevLeftToRightPostGain = -prevLeftPan;
-    }
-
-    if(prevRightPan > 0.0f){
-        prevRightPostGain = prevRightPan;
-        prevRightToLeftPostGain = 0.0f;
-    }
-    else{
-        prevRightPostGain = 0.0f;
-        prevRightToLeftPostGain = -prevRightPan;
-    }
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -205,18 +125,6 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
   #endif
 }
 
-static float gainRamp(float& prevGain, float currentGain, int sampleNum){
-    if(abs(prevGain - currentGain) < 0.01f){
-        return currentGain;
-    }
-
-    float step = (currentGain - prevGain)/(float) sampleNum;
-    
-    prevGain += step;
-
-    return prevGain;
-}
-
 void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                               juce::MidiBuffer& midiMessages)
 {
@@ -225,7 +133,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    auto sampleNum = buffer.getNumSamples();
+    // auto sampleNum = buffer.getNumSamples();
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -236,59 +144,11 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    auto* leftChannel = buffer.getWritePointer(0);
-    auto* rightChannel = buffer.getWritePointer(1);
 
-    //stereo channel mixing vars.
-    float lPreGain = leftPreGain->get();
-    float rPreGain = rightPreGain->get();
-    float l2rGain = leftToRightGain->get();
-    float r2lGain = rightToLeftGain->get();
+    auto mg = apvts.getRawParameterValue("inputGain")->load();
+    InputGain.setTargetValue(mg);
 
-    //post-stereo panning vars.
-    float lPan = -leftPan->get();
-    float rPan = rightPan->get();
-    float lPostGain;
-    float rPostGain;
-    float l2rPostGain;
-    float r2lPostGain;
-
-    if(lPan > 0.0f){
-        lPostGain = lPan;
-        l2rPostGain = 0.0f;
-    }
-    else{
-        lPostGain = 0.0f;
-        l2rPostGain = -lPan;
-    }
-
-    if(rPan > 0.0f){
-        rPostGain = rPan;
-        r2lPostGain = 0.0f;
-    }
-    else{
-        rPostGain = 0.0f;
-        r2lPostGain = -rPan;
-    }
-
-    for(int i = 0; i < buffer.getNumSamples(); i++){
-        auto currentLeftSample = leftChannel[i];
-        auto currentRightSample = rightChannel[i];
-
-        leftChannel[i] = gainRamp(prevLeftPreGain, lPreGain, sampleNum)*currentLeftSample + gainRamp(prevRightToLeftGain, r2lGain, sampleNum)*currentRightSample;
-        rightChannel[i] = gainRamp(prevRightPreGain, rPreGain, sampleNum)*currentRightSample + gainRamp(prevLeftToRightGain, l2rGain, sampleNum)*currentLeftSample;
-
-        currentLeftSample = leftChannel[i];
-        currentRightSample = rightChannel[i];
-
-        leftChannel[i] = gainRamp(prevLeftPostGain, lPostGain, sampleNum)*currentLeftSample + gainRamp(prevRightToLeftPostGain, r2lPostGain, sampleNum)*currentRightSample;
-        rightChannel[i] = gainRamp(prevRightPostGain, rPostGain, sampleNum)*currentRightSample + gainRamp(prevLeftToRightPostGain, l2rPostGain, sampleNum)*currentLeftSample;
-    }
-
-    auto mg = apvts.getRawParameterValue("mainGain")->load();
-    mainGain.setTargetValue(mg);
-
-    buffer.applyGain(mainGain.getNextValue());
+    buffer.applyGain(InputGain.getNextValue());
 }
 
 //==============================================================================
@@ -305,33 +165,36 @@ juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
 //==============================================================================
 void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    std::unique_ptr<juce::XmlElement> xml(new juce::XmlElement("pantheonParameterXML"));
-    xml->setAttribute("leftpregain", (double) *leftPreGain);
-    xml->setAttribute("rightpregain", (double) *rightPreGain);
-    xml->setAttribute("lefttorightgain", (double) *leftToRightGain);
-    xml->setAttribute("righttoleftgain", (double) *rightToLeftGain);
-    xml->setAttribute("leftpan", (double) *leftPan);
-    xml->setAttribute("rightpan", (double) *rightPan);
-    copyXmlToBinary(*xml, destData);
+    ignoreUnused(destData);
 }
 
 void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
-    if(xml.get() != nullptr){
-        if(xml->hasTagName("pantheonParameterXML")){
-            *leftPreGain = (float)xml->getDoubleAttribute("leftpregain", 1.0f);
-            *rightPreGain = (float)xml->getDoubleAttribute("rightpregain", 1.0f);
-            *leftToRightGain = (float)xml->getDoubleAttribute("lefttorightgain", 0.0f);
-            *rightToLeftGain = (float)xml->getDoubleAttribute("righttoleftgain", 0.0f);
-            *leftPan = (float)xml->getDoubleAttribute("leftpan", -1.0f);
-            *rightPan = (float)xml->getDoubleAttribute("rightpan", 1.0f);
-        }
-    }
+    ignoreUnused(data, sizeInBytes);
 }
 
 AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
     AudioProcessorValueTreeState::ParameterLayout parameterLayout;
+
+    // INPUT GAIN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "inputGain",
+            "Input Gain",
+            NormalisableRange<float>{0.f, 2.f, 0.01f},
+            1.f
+        )
+    );
+
+    // INPUT PAN
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "inputPan",
+            "Input Gain",
+            NormalisableRange<float>{-1.f, 1.f, 0.01f},
+            0.f
+        )
+    );
 
     //TODO: this
     /**
@@ -395,48 +258,10 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         )
     );
     */
-
-    // MAIN GAIN
-    parameterLayout.add(
-        std::make_unique<AudioParameterFloat>(
-            "mainGain",
-            "Main Gain",
-            NormalisableRange<float>{0.f, 2.f},
-        1.f
-        )
-    );
     
     return parameterLayout;
 }
 
-//==============================================================================
-void AudioPluginAudioProcessor::setLeftPreGain(float newValue)
-{
-    *leftPreGain = newValue;
-}
-
-void AudioPluginAudioProcessor::setRightPreGain(float newValue)
-{
-    *rightPreGain = newValue;
-}
-
-void AudioPluginAudioProcessor::setLeftToRightGain(float newValue)
-{
-    *leftToRightGain = newValue;
-}
-
-void AudioPluginAudioProcessor::setRightToLeftGain(float newValue)
-{
-    *rightToLeftGain = newValue;
-}
-
-void AudioPluginAudioProcessor::setLeftPan(float newValue){
-    *leftPan = newValue;
-}
-
-void AudioPluginAudioProcessor::setRightPan(float newValue){
-    *rightPan = newValue;
-}
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

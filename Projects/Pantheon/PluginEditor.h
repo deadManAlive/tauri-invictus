@@ -2,12 +2,12 @@
 
 #include "PluginProcessor.h"
 #include <memory>
+
+// #include <memory>
 // #include "BinaryData.h"
 
 //==============================================================================
-class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor,
-                                         private juce::Slider::Listener,
-                                         private juce::Timer
+class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
     explicit AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor&, AudioProcessorValueTreeState&);
@@ -25,18 +25,13 @@ private:
     AudioPluginAudioProcessor& processorRef;
     AudioProcessorValueTreeState& parameters;
 
-    void sliderValueChanged(juce::Slider* slider) override;
-    void timerCallback() override;
+    juce::Slider inputGainSlider;
+    std::unique_ptr<SliderAttachment> inputGainAttachment;
 
-    juce::Slider lPreGainSlider;
-    juce::Slider rPreGainSlider;
-    juce::Slider l2rGainSlider;
-    juce::Slider r2lGainSlider;
-    juce::Slider leftPanSlider;
-    juce::Slider rightPanSlider;
+    juce::Slider inputPanSlider;
+    std::unique_ptr<SliderAttachment> inputPanAttachment;
 
-    juce::Slider mainGainSlider;
-    std::unique_ptr<SliderAttachment> mainGainAttachment;
+    TooltipWindow tooltipWindow;
 
     // juce::Image backGroundImg = juce::ImageCache::getFromMemory(BinaryData::bgscribble_png, BinaryData::bgscribble_pngSize);
 

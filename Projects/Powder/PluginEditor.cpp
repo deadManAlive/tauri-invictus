@@ -5,8 +5,8 @@
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : AudioProcessorEditor (&p)
     , processorRef (p)
-    , fftSpectrum (processorRef, apvts)
-    , controlPanel (processorRef, apvts)
+    , fftSpectrum (p, apvts)
+    , controlPanel (p, apvts)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
