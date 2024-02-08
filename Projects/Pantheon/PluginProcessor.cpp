@@ -145,8 +145,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
 
 
-    auto mg = apvts.getRawParameterValue("inputGain")->load();
-    InputGain.setTargetValue(mg);
+    auto inputGainValue = apvts.getRawParameterValue("inputGain")->load();
+    InputGain.setTargetValue(inputGainValue);
 
     buffer.applyGain(InputGain.getNextValue());
 }
@@ -196,8 +196,6 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         )
     );
 
-    //TODO: this
-    /**
     // LEFT PRE-GAIN
     parameterLayout.add(
         std::make_unique<AudioParameterFloat>(
@@ -231,13 +229,15 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
     // RIGHT-TO-LEFT GAIN
     parameterLayout.add(
         std::make_unique<AudioParameterFloat>(
-            "righToLeftGain",
+            "rightToLeftGain",
             "Right-to-Left Gain",
             NormalisableRange<float>{-2.f, 2.f},
             0.f
         )
     );
 
+    //TODO: this
+    /**
     // LEFT PAN
     parameterLayout.add(
         std::make_unique<AudioParameterFloat>(

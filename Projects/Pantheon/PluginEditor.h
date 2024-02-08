@@ -3,6 +3,7 @@
 #include "PluginProcessor.h"
 #include <memory>
 
+#include "MixerComponent.h"
 // #include <memory>
 // #include "BinaryData.h"
 
@@ -24,13 +25,18 @@ private:
     // access the processor object that created it.
     AudioPluginAudioProcessor& processorRef;
     AudioProcessorValueTreeState& parameters;
-
+    
+    //==============================================================================
     juce::Slider inputGainSlider;
     std::unique_ptr<SliderAttachment> inputGainAttachment;
 
     juce::Slider inputPanSlider;
     std::unique_ptr<SliderAttachment> inputPanAttachment;
 
+    //==============================================================================
+    MixerComponent mixerComponent;
+
+    //==============================================================================
     TooltipWindow tooltipWindow;
 
     // juce::Image backGroundImg = juce::ImageCache::getFromMemory(BinaryData::bgscribble_png, BinaryData::bgscribble_pngSize);
