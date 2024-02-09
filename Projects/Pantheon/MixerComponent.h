@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+#include "LookAndFeel.h"
 #include "PluginProcessor.h"
 
 class MixerComponent : public juce::Component
@@ -28,6 +29,9 @@ private:
     SliderAttachmentPtr leftPreGainAttachment = nullptr;
     SliderAttachmentPtr rightPreGainAttachment = nullptr;
     SliderAttachmentPtr leftToRightGainAttachment = nullptr;
+
+    PanLook leftPanLook;
+    PanLook rightPanLook;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixerComponent)
 };

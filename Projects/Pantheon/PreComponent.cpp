@@ -5,16 +5,15 @@ PreComponent::PreComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTree
     , parameters(apvts)
     , inputGainSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
     , inputPanSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
-    , panLok(PanLook::Type::Pan)
-    , volLok(PanLook::Type::Gain)
 {
-    inputGainSlider.setTooltip("Input Gain");
-    inputGainSlider.setLookAndFeel(&volLok);
+    panLook.setRotaryType(PanLook::RotaryType::FromMid);
+    volLook.setRotaryType(PanLook::RotaryType::FromMin);
+
+    inputGainSlider.setLookAndFeel(&volLook);
     addAndMakeVisible(inputGainSlider);
     inputGainAttachment.reset(new SliderAttachment(parameters, "inputGain", inputGainSlider));
 
-    inputPanSlider.setTooltip("Input Pan");
-    inputPanSlider.setLookAndFeel(&panLok);
+    inputPanSlider.setLookAndFeel(&panLook);
     addAndMakeVisible(inputPanSlider);
     inputPanAttachment.reset(new SliderAttachment(parameters, "inputPan", inputPanSlider));
 }

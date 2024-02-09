@@ -8,16 +8,25 @@ MixerComponent::MixerComponent(AudioPluginAudioProcessor& p, AudioProcessorValue
     , rightPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , leftToRightGainSlider(Slider::LinearVertical, Slider::NoTextBox)
 {
+    leftPanLook.setRotaryType(PanLook::RotaryType::FromMid);
+    leftPanLook.setLinearType(PanLook::LinearType::Left);
+    rightPanLook.setRotaryType(PanLook::RotaryType::FromMid);
+    rightPanLook.setLinearType(PanLook::LinearType::Right);
+
     addAndMakeVisible(rightToLeftGainSlider);
+    rightToLeftGainSlider.setLookAndFeel(&rightPanLook);
     rightToLeftGainAttachment.reset(new SliderAttachment(parameters, "rightToLeftGain", rightToLeftGainSlider));
 
     addAndMakeVisible(leftPreGainSlider);
+    leftPreGainSlider.setLookAndFeel(&leftPanLook);
     leftPreGainAttachment.reset(new SliderAttachment(parameters, "leftPreGain", leftPreGainSlider));
 
     addAndMakeVisible(rightPreGainSlider);
+    rightPreGainSlider.setLookAndFeel(&rightPanLook);
     rightPreGainAttachment.reset(new SliderAttachment(parameters, "rightPreGain", rightPreGainSlider));
 
     addAndMakeVisible(leftToRightGainSlider);
+    leftToRightGainSlider.setLookAndFeel(&leftPanLook);
     leftToRightGainAttachment.reset(new SliderAttachment(parameters, "leftToRightGain", leftToRightGainSlider));
 }
 
@@ -34,7 +43,7 @@ void MixerComponent::paint(juce::Graphics& g) {
     const auto negonepos = rightToLeftGainSlider.getPositionOfValue(-1.0f);
 
 
-    g.setColour (Colours::honeydew);
+    g.setColour (Colours::mintcream);
     juce::Line<float> ones (juce::Point<float> (width / 4, onepos),
                             juce::Point<float> (3 * width / 4, onepos));
     juce::Line<float> zeros (juce::Point<float> (width / 4, height / 2),

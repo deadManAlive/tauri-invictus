@@ -26,8 +26,8 @@ private:
     SliderAttachmentPtr inputGainAttachment;
     SliderAttachmentPtr inputPanAttachment;
 
-    PanLook panLok;
-    PanLook volLok;
+    PanLook panLook;
+    PanLook volLook;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreComponent)
 };
