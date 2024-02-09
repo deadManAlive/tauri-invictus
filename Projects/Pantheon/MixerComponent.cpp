@@ -7,12 +7,9 @@ MixerComponent::MixerComponent(AudioPluginAudioProcessor& p, AudioProcessorValue
     , leftPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , rightPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , leftToRightGainSlider(Slider::LinearVertical, Slider::NoTextBox)
+    , leftPanLook(PanLook::RotaryType::FromMid, PanLook::LinearType::Left)
+    , rightPanLook(PanLook::RotaryType::FromMid, PanLook::LinearType::Right)
 {
-    leftPanLook.setRotaryType(PanLook::RotaryType::FromMid);
-    leftPanLook.setLinearType(PanLook::LinearType::Left);
-    rightPanLook.setRotaryType(PanLook::RotaryType::FromMid);
-    rightPanLook.setLinearType(PanLook::LinearType::Right);
-
     addAndMakeVisible(rightToLeftGainSlider);
     rightToLeftGainSlider.setLookAndFeel(&rightPanLook);
     rightToLeftGainAttachment.reset(new SliderAttachment(parameters, "rightToLeftGain", rightToLeftGainSlider));

@@ -14,10 +14,9 @@ public:
         Right,
     };
 
-    PanLook();
-
-    void setRotaryType(RotaryType);
-    void setLinearType(LinearType);
+    PanLook() = delete;
+    PanLook(RotaryType rt, bool = false);
+    PanLook(RotaryType, LinearType, bool = false);
 
     void drawRotarySlider(Graphics&, int, int, int, int, float, float, float, Slider&) override;
     void drawLinearSlider(Graphics&, int, int, int, int, float, float, float, Slider::SliderStyle, Slider&) override;
@@ -27,4 +26,5 @@ private:
     Colour thumbColour = Colours::bisque;
     RotaryType rotaryType;
     LinearType linearType;
+    bool isReversed;
 };

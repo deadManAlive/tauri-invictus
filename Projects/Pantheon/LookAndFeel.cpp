@@ -1,15 +1,17 @@
 #include "LookAndFeel.h"
+#include <utility>
 
-PanLook::PanLook()
+PanLook::PanLook(RotaryType rt, LinearType lt, bool reversed)
+    : rotaryType(rt)
+    , linearType(lt)
+    , isReversed(reversed)
+{   
+}
+
+PanLook::PanLook(RotaryType rt, bool reversed)
+    : rotaryType(rt)
+    , isReversed(reversed)
 {
-}
-
-void PanLook::setRotaryType(RotaryType rtype) {
-    rotaryType = rtype;
-}
-
-void PanLook::setLinearType(LinearType ltype) {
-    linearType = ltype;
 }
 
 void PanLook::drawRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, Slider& slider) {
@@ -95,14 +97,17 @@ void PanLook::drawLinearSlider(Graphics& g,
     
     Point<float> startPoint (slider.isHorizontal() ? (float) x : (float) x + (float) width * 0.5f,
                              slider.isHorizontal() ? (float) y + (float) height * 0.5f : (float) (height + y));
-    // Point<float> midPoint(startPoint.x, (float) (y + height * 0.5));
-    Point<float> midPoint(slider.isHorizontal() ? (float) (x + width * 0.5) : startPoint.x,
-                          slider.isHorizontal() ? startPoint.y : (float) (y + height * 0.5));
-    // Point<float> thumbPoint(startPoint.x, sliderPos);
-    Point<float> thumbPoint(slider.isHorizontal() ? sliderPos : startPoint.x,
-                            slider.isHorizontal() ? startPoint.y : sliderPos);
     Point<float> endPoint (slider.isHorizontal() ? (float) (width + x) : startPoint.x,
                            slider.isHorizontal() ? startPoint.y : (float) y);
+
+    if (isReversed) {
+        std::swap(startPoint, endPoint);
+    }
+
+    Point<float> midPoint(slider.isHorizontal() ? (float) (x + width * 0.5) : startPoint.x,
+                          slider.isHorizontal() ? startPoint.y : (float) (y + height * 0.5));
+    Point<float> thumbPoint(slider.isHorizontal() ? sliderPos : startPoint.x,
+                            slider.isHorizontal() ? startPoint.y : sliderPos);
 
     Path backgroundTrack;
     backgroundTrack.startNewSubPath(startPoint);
@@ -113,14 +118,25 @@ void PanLook::drawLinearSlider(Graphics& g,
     const auto fill = linearType == LinearType::Left ? leftColour : rightColour;
 
     Path valueTrack;
-    valueTrack.startNewSubPath(midPoint);
+    if (rotaryType == RotaryType::FromMin) {
+        valueTrack.startNewSubPath(startPoint);
+    } else {
+        valueTrack.startNewSubPath(midPoint);
+    }
     valueTrack.lineTo(thumbPoint);
     g.setColour(fill);
     g.strokePath(valueTrack, {trackWidth, PathStrokeType::mitered, PathStrokeType::butt});
 
     Path thumbTrack;
-    Point<float> thumbStartPoint(startPoint.x, thumbPoint.y - (float)height * 0.02f);
-    Point<float> thumbEndPoint(startPoint.x, thumbPoint.y + (float)height * 0.02f);
+
+    const auto hoffset = jmin(8.f, (float) width * 0.02f);
+    // Point<float> thumbStartPoint(startPoint.x, thumbPoint.y - (float)height * 0.02f);
+    Point<float> thumbStartPoint(slider.isHorizontal() ? thumbPoint.x - hoffset : startPoint.x,
+                                 slider.isHorizontal() ? startPoint.y : thumbPoint.y - (float) height * 0.02f);
+    // Point<float> thumbEndPoint(startPoint.x, thumbPoint.y + (float)height * 0.02f);
+    Point<float> thumbEndPoint(slider.isHorizontal() ? thumbPoint.x + hoffset : startPoint.x,
+                               slider.isHorizontal() ? startPoint.y : thumbPoint.y + (float) height * 0.02f);
+
     thumbTrack.startNewSubPath(thumbStartPoint);
     thumbTrack.lineTo(thumbEndPoint);
     g.setColour(thumbColour);

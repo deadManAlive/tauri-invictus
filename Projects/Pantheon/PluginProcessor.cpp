@@ -196,12 +196,14 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         )
     );
 
+    NormalisableRange<float> mixerRange {-2.f, 2.f};
+
     // LEFT PRE-GAIN
     parameterLayout.add(
         std::make_unique<AudioParameterFloat>(
             "leftPreGain",
             "Left Pre Gain",
-            NormalisableRange<float>{-2.f, 2.f},
+            mixerRange,
             1.f
         )
     );
@@ -211,7 +213,7 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         std::make_unique<AudioParameterFloat>(
             "rightPreGain",
             "Right Pre Gain",
-            NormalisableRange<float>{-2.f, 2.f},
+            mixerRange,
             1.f
         )
     );
@@ -221,7 +223,7 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         std::make_unique<AudioParameterFloat>(
             "leftToRightGain",
             "Left-to-Right Gain",
-            NormalisableRange<float>{-2.f, 2.f},
+            mixerRange,
             0.f
         )
     );
@@ -231,7 +233,7 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         std::make_unique<AudioParameterFloat>(
             "rightToLeftGain",
             "Right-to-Left Gain",
-            NormalisableRange<float>{-2.f, 2.f},
+            mixerRange,
             0.f
         )
     );
@@ -242,7 +244,7 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
             "leftPan",
             "Left Pan",
             NormalisableRange<float>{-1.f, 1.f},
-            1.f
+            -1.f
         )
     );
 
