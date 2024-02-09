@@ -1,18 +1,22 @@
 #include "LookAndFeel.h"
 #include <utility>
 
-PanLook::PanLook(RotaryType rt, LinearType lt, bool reversed)
-    : rotaryType(rt)
-    , linearType(lt)
+PanLook::PanLook(Origin origin, Channel channel, bool reversed)
+    : sliderOrigin(origin)
+    , sliderChannel(channel)
     , isReversed(reversed)
 {   
 }
 
-PanLook::PanLook(RotaryType rt, bool reversed)
-    : rotaryType(rt)
+PanLook::PanLook(Origin origin, bool reversed)
+    : sliderOrigin(origin)
     , isReversed(reversed)
 {
 }
+
+Colour PanLook::leftColour = Colours::goldenrod;
+Colour PanLook::rightColour = Colours::indianred;
+Colour PanLook::thumbColour = Colours::bisque;
 
 void PanLook::drawRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, Slider& slider) {
     const auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
@@ -20,7 +24,7 @@ void PanLook::drawRotarySlider(Graphics& g, int x, int y, int width, int height,
     Colour fill;
     float fillOriginAngle;
 
-    if (rotaryType == RotaryType::FromMid) {
+    if (sliderOrigin == Origin::FromMid) {
         fill = sliderPos > 0.5f ? rightColour : leftColour;
         fillOriginAngle = MathConstants<float>::twoPi;
     } else {
@@ -115,10 +119,10 @@ void PanLook::drawLinearSlider(Graphics& g,
     g.setColour(slider.findColour(Slider::backgroundColourId));
     g.strokePath(backgroundTrack, {trackWidth, PathStrokeType::mitered, PathStrokeType::butt});
 
-    const auto fill = linearType == LinearType::Left ? leftColour : rightColour;
+    const auto fill = sliderChannel == Channel::Left ? leftColour : rightColour;
 
     Path valueTrack;
-    if (rotaryType == RotaryType::FromMin) {
+    if (sliderOrigin == Origin::FromMin) {
         valueTrack.startNewSubPath(startPoint);
     } else {
         valueTrack.startNewSubPath(midPoint);

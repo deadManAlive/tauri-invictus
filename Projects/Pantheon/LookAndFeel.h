@@ -4,27 +4,31 @@
 
 class PanLook : public LookAndFeel_V4 {
 public:
-    enum class RotaryType {
+    //==============================================================================
+    enum class Origin {
         FromMin,
         FromMid,
     };
 
-    enum class LinearType {
+    enum class Channel {
         Left,
         Right,
     };
 
+    //==============================================================================
     PanLook() = delete;
-    PanLook(RotaryType rt, bool = false);
-    PanLook(RotaryType, LinearType, bool = false);
+    PanLook(Origin, bool = false);
+    PanLook(Origin, Channel, bool = false);
 
     void drawRotarySlider(Graphics&, int, int, int, int, float, float, float, Slider&) override;
     void drawLinearSlider(Graphics&, int, int, int, int, float, float, float, Slider::SliderStyle, Slider&) override;
+    
+    //==============================================================================
+    static Colour leftColour;
+    static Colour rightColour;
+    static Colour thumbColour;
 private:
-    Colour leftColour = Colours::goldenrod;
-    Colour rightColour = Colours::indianred;
-    Colour thumbColour = Colours::bisque;
-    RotaryType rotaryType;
-    LinearType linearType;
+    Origin sliderOrigin;
+    Channel sliderChannel;
     bool isReversed;
 };

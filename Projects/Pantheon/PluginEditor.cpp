@@ -14,11 +14,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(preComponent);
     addAndMakeVisible(mixerComponent);
     addAndMakeVisible(postComponent);
+    addAndMakeVisible(filler);
 
-    double ratio = 2./3.;
+    double ratio = 1./2.;
     int min_height = 200;
     int max_height = 1080;
-    int default_size = 420;
+    int default_size = 320;
     setResizeLimits(min_height, (int)(min_height/ratio), max_height, (int)(max_height/ratio));
     getConstrainer()->setFixedAspectRatio(ratio);
     setSize(default_size, (int)(default_size/ratio));
@@ -35,6 +36,9 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
+void FillerComp::paint(Graphics& g) {
+    g.fillAll(Colours::black);
+}
 
 void AudioPluginAudioProcessorEditor::resized()
 {
@@ -46,15 +50,17 @@ void AudioPluginAudioProcessorEditor::resized()
     using Fr = Grid::Fr;
 
     grid.templateRows = {
-        Track(Fr(2)),
         Track(Fr(3)),
+        Track(Fr(5)),
         Track(Fr(1)),
+        Track(Fr(2)),
     };
     grid.templateColumns = {Track(Fr(1))};
 
     grid.items = {
         GridItem(preComponent),
         GridItem(mixerComponent),
+        GridItem(filler),
         GridItem(postComponent),
     };
 

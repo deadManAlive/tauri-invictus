@@ -7,8 +7,8 @@ MixerComponent::MixerComponent(AudioPluginAudioProcessor& p, AudioProcessorValue
     , leftPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , rightPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , leftToRightGainSlider(Slider::LinearVertical, Slider::NoTextBox)
-    , leftPanLook(PanLook::RotaryType::FromMid, PanLook::LinearType::Left)
-    , rightPanLook(PanLook::RotaryType::FromMid, PanLook::LinearType::Right)
+    , leftPanLook(PanLook::Origin::FromMid, PanLook::Channel::Left)
+    , rightPanLook(PanLook::Origin::FromMid, PanLook::Channel::Right)
 {
     addAndMakeVisible(rightToLeftGainSlider);
     rightToLeftGainSlider.setLookAndFeel(&rightPanLook);

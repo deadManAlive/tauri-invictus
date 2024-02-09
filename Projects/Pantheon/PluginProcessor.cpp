@@ -196,7 +196,7 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
         )
     );
 
-    NormalisableRange<float> mixerRange {-2.f, 2.f};
+    NormalisableRange<float> mixerRange {-4.f, 4.f, 0.01f, 0.5f, true};
 
     // LEFT PRE-GAIN
     parameterLayout.add(

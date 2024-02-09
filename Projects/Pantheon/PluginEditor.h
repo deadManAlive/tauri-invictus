@@ -8,6 +8,12 @@
 // #include "BinaryData.h"
 
 //==============================================================================
+class FillerComp : public Component {
+public:
+    void paint(Graphics& g) override;
+};
+
+//==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
@@ -30,6 +36,7 @@ private:
     MixerComponent mixerComponent;
     PreComponent preComponent;
     PostComponent postComponent;
+    FillerComp filler;
 
     //==============================================================================
     TooltipWindow tooltipWindow;
