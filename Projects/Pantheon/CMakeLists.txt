@@ -16,6 +16,7 @@ juce_generate_juce_header(Pantheon)
 
 target_sources(Pantheon
   PRIVATE
+    LookAndFeel.cpp
     MixerComponent.cpp
     PluginEditor.cpp
     PluginProcessor.cpp

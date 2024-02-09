@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+#include "LookAndFeel.h"
 #include "PluginProcessor.h"
 
 class PreComponent : public juce::Component
@@ -24,6 +25,9 @@ private:
 
     SliderAttachmentPtr inputGainAttachment;
     SliderAttachmentPtr inputPanAttachment;
+
+    PanLook panLok;
+    PanLook volLok;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreComponent)
 };
