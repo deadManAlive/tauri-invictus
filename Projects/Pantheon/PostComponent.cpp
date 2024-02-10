@@ -15,6 +15,11 @@ PostComponent::PostComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTr
     rightPostPanSlider.setLookAndFeel(&rightPanLook);
     addAndMakeVisible(rightPostPanSlider);
     rightPostPanAttachment.reset(new SliderAttachment(parameters, "rightPan", rightPostPanSlider));
+    
+    border.setText("Post");
+    border.setLookAndFeel(&leftPanLook);
+    border.setEnabled(false);
+    addAndMakeVisible(border);
 }
 
 PostComponent::~PostComponent() {}
@@ -24,17 +29,21 @@ void PostComponent::paint(juce::Graphics& g) {
 
     const auto bounds = getLocalBounds().toFloat();
     const float height = bounds.getHeight();
+    const float width = bounds.getWidth();
 
     const auto r = leftPostPanSlider.getNormalisableRange();
+    const auto offset = width / 12.f;
 
     for (double s = r.start; s <= r.end; s += 1.) {
         g.setColour(Colours::linen.withAlpha(0.5f + 0.25f * (float)std::abs(s) / (float)std::abs(r.start)));
         const auto pos = leftPostPanSlider.getPositionOfValue(s);
-        g.drawLine({Point<float>{pos, 0}, Point<float>{pos, height}}, 2.f);
+        g.drawLine({Point<float>{pos + offset, 0.2f * height}, Point<float>{pos + offset, 0.8f * height}}, 2.f);
     }
 }
 
 void PostComponent::resized() {
+    border.setBounds(getLocalBounds());
+
     Grid grid;
 
     using Track = Grid::TrackInfo;
@@ -44,12 +53,16 @@ void PostComponent::resized() {
         Track(Fr(1)),
         Track(Fr(1)),
     };
-    grid.templateColumns = {Track(Fr(1))};
-
-    grid.items = {
-        GridItem(leftPostPanSlider),
-        GridItem(rightPostPanSlider),
+    grid.templateColumns = {
+        Track(Fr(1)),
+        Track(Fr(10)),
+        Track(Fr(1)),
     };
 
-    grid.performLayout(getLocalBounds());
+    grid.items = {
+        GridItem(leftPostPanSlider).withArea(1, 2),
+        GridItem(rightPostPanSlider).withArea(2, 2),
+    };
+
+    grid.performLayout(getLocalBounds().reduced(0, 8));
 }

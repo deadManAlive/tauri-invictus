@@ -15,6 +15,12 @@ PreComponent::PreComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTree
     inputPanSlider.setLookAndFeel(&panLook);
     addAndMakeVisible(inputPanSlider);
     inputPanAttachment.reset(new SliderAttachment(parameters, "inputPan", inputPanSlider));
+
+    border.setLookAndFeel(&panLook);
+    border.setText("Pre");
+    border.setEnabled(false);
+    border.setColour(GroupComponent::outlineColourId, Colours::linen);
+    addAndMakeVisible(border);
 }
 
 PreComponent::~PreComponent() {}
@@ -24,6 +30,8 @@ void PreComponent::paint(juce::Graphics& g) {
 }
 
 void PreComponent::resized() {
+    border.setBounds(getLocalBounds().reduced(4));
+
     Grid grid;
 
     using Track = Grid::TrackInfo;
@@ -40,5 +48,6 @@ void PreComponent::resized() {
         GridItem(inputPanSlider),
     };
 
-    grid.performLayout(getLocalBounds());
+    const auto width = getLocalBounds().getWidth();
+    grid.performLayout(getLocalBounds().reduced(width / 12));
 }

@@ -5,15 +5,17 @@
 //==============================================================================
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : AudioProcessorEditor (&p)
-    , processorRef(p)
-    , parameters(apvts)
+    // , processorRef(p)
+    // , parameters(apvts)
     , mixerComponent(p, apvts)
     , preComponent(p, apvts)
     , postComponent(p, apvts)
+    , fxComponent(p, apvts)
 {
     panLook.setColour(GroupComponent::outlineColourId, Colours::linen);
     panLook.setColour(GroupComponent::textColourId, Colours::linen);
 
+    panLook.textH = 20.f;
     border.setLookAndFeel(&panLook);
     border.setText("Pantheon");
 
@@ -21,13 +23,14 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(mixerComponent);
     addAndMakeVisible(postComponent);
     addAndMakeVisible(filler);
-    
+    addAndMakeVisible(fxComponent);
+
     addAndMakeVisible(border);
 
     double ratio = 1./2.;
     int min_height = 200;
     int max_height = 1080;
-    int default_size = 240;
+    int default_size = 300;
     setResizeLimits(min_height, (int)(min_height/ratio), max_height, (int)(max_height/ratio));
     getConstrainer()->setFixedAspectRatio(ratio);
     setSize(default_size, (int)(default_size/ratio));
@@ -93,15 +96,19 @@ void AudioPluginAudioProcessorEditor::resized()
     using Fr = Grid::Fr;
 
     grid.templateRows = {
-        Track(Fr(6)),
+        Track(Fr(5)),
         Track(Fr(10)),
         Track(Fr(1)),
-        Track(Fr(2)),
+        Track(Fr(3)),
     };
-    grid.templateColumns = {Track(Fr(1)), Track(Fr(1))};
+    grid.templateColumns = {
+        Track(Fr(3)),
+        Track(Fr(5))
+    };
 
     grid.items = {
         GridItem(preComponent),
+        GridItem(fxComponent),
         GridItem(mixerComponent).withArea(2, GridItem::Span(2)),
         GridItem(filler).withArea(3, GridItem::Span(2)),
         GridItem(postComponent).withArea(4, GridItem::Span(2)),

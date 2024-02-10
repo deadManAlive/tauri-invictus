@@ -21,6 +21,7 @@ PanLook::PanLook(Origin origin, bool reversed)
 Colour PanLook::leftColour = Colours::goldenrod;
 Colour PanLook::rightColour = Colours::indianred;
 Colour PanLook::thumbColour = Colours::bisque;
+Colour PanLook::outlineColour = Colours::linen;
 
 void PanLook::drawRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, Slider& slider) {
     const auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
@@ -159,7 +160,6 @@ void PanLook::drawGroupComponentOutline (Graphics& g, int width, int height,
                                                 const String& text, const Justification& position,
                                                 GroupComponent& group)
 {
-    const float textH = 20.0f;
     const float indent = 3.0f;
     const float textEdgeGap = 4.0f;
     auto cs = 5.0f;
@@ -215,4 +215,107 @@ void PanLook::drawGroupComponentOutline (Graphics& g, int width, int height,
                 roundToInt (textW),
                 roundToInt (textH),
                 Justification::centred, true);
+}
+
+void PanLook::drawButtonBackground(Graphics& g,
+                                           Button& button,
+                                           const Colour& backgroundColour,
+                                           bool shouldDrawButtonAsHighlighted,
+                                           bool shouldDrawButtonAsDown)
+{
+    auto cornerSize = 4.0f;
+    auto bounds = button.getLocalBounds().toFloat().reduced (0.5f, 0.5f);
+
+    auto baseColour = backgroundColour;
+
+    baseColour = button.hasKeyboardFocus(true)
+                    ? baseColour.withMultipliedBrightness(1.3f)
+                    : baseColour.withMultipliedSaturation(0.9f);
+
+    baseColour = button.getToggleState()
+                    ? rightColour
+                    : baseColour;
+                    
+    baseColour = button.isEnabled()
+                    ? baseColour.withMultipliedAlpha(1.0f)
+                    : baseColour.withMultipliedAlpha(0.5f);
+
+    if (shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted) {
+        baseColour = shouldDrawButtonAsDown
+                        ? baseColour.contrasting(0.2f)
+                        : baseColour.contrasting(0.5f);
+    }
+
+
+    g.setColour (baseColour);
+
+    auto flatOnLeft   = button.isConnectedOnLeft();
+    auto flatOnRight  = button.isConnectedOnRight();
+    auto flatOnTop    = button.isConnectedOnTop();
+    auto flatOnBottom = button.isConnectedOnBottom();
+
+    if (flatOnLeft || flatOnRight || flatOnTop || flatOnBottom)
+    {
+        Path path;
+        path.addRoundedRectangle (bounds.getX(), bounds.getY(),
+                                  bounds.getWidth(), bounds.getHeight(),
+                                  cornerSize, cornerSize,
+                                  ! (flatOnLeft  || flatOnTop),
+                                  ! (flatOnRight || flatOnTop),
+                                  ! (flatOnLeft  || flatOnBottom),
+                                  ! (flatOnRight || flatOnBottom));
+
+        g.fillPath (path);
+
+        g.setColour (outlineColour);
+        g.strokePath (path, PathStrokeType (2.0f));
+    }
+    else
+    {
+        g.fillRoundedRectangle (bounds, cornerSize);
+
+        g.setColour (outlineColour);
+        g.drawRoundedRectangle (bounds, cornerSize, 2.0f);
+    }
+}
+
+void PanLook::drawButtonText (Graphics& g, TextButton& button,
+                                     bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/)
+{
+    const auto isToggled = button.getToggleState();
+    
+    Font font (getTextButtonFont (button, button.getHeight()));
+    
+    if (isToggled) {
+        font.setBold(true);
+    }
+
+    g.setFont (font);
+
+    auto buttonTextColour = button.findColour(button.getToggleState()
+                            ? TextButton::textColourOnId
+                            : TextButton::textColourOffId);
+
+    buttonTextColour = isToggled
+                        ? thumbColour
+                        : buttonTextColour;
+
+    buttonTextColour = button.isEnabled()
+                    ? buttonTextColour.withMultipliedAlpha(1.0f)
+                    : buttonTextColour.withMultipliedAlpha(0.5f);
+
+    g.setColour (buttonTextColour);
+
+    const int yIndent = jmin (4, button.proportionOfHeight (0.3f));
+    const int cornerSize = jmin (button.getHeight(), button.getWidth()) / 2;
+
+    const int fontHeight = roundToInt (font.getHeight() * 0.6f);
+    const int leftIndent  = jmin (fontHeight, 2 + cornerSize / (button.isConnectedOnLeft() ? 4 : 2));
+    const int rightIndent = jmin (fontHeight, 2 + cornerSize / (button.isConnectedOnRight() ? 4 : 2));
+    const int textWidth = button.getWidth() - leftIndent - rightIndent;
+
+    if (textWidth > 0)
+        g.drawFittedText (button.getButtonText(),
+                          leftIndent, yIndent, textWidth, button.getHeight() - yIndent * 2,
+                          Justification::centred, 2);
 }

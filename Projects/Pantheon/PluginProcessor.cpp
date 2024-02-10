@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "juce_core/system/juce_PlatformDefs.h"
 #include <memory>
 
 //==============================================================================
@@ -148,6 +149,10 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto inputGainValue = apvts.getRawParameterValue("inputGain")->load();
     InputGain.setTargetValue(inputGainValue);
 
+    // auto fxPosition = apvts.getRawParameterValue("fxPosition")->load();
+
+    // DBG(fxPosition);
+
     buffer.applyGain(InputGain.getNextValue());
 }
 
@@ -257,7 +262,37 @@ AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createP
             1.f
         )
     );
+
+    // FX POSITION
+    // NOTE: true = pre, false = post.
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "fxPosition",
+            "FX Position",
+            0.f, 1.f, 1.f
+        )
+    );
+
+    // DELAY LINE
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "delayLine",
+            "Delay",
+            NormalisableRange<float>{-1.f, 1.f},
+            0.f
+        )
+    );
     
+    // ALL-PASS FILTER
+    parameterLayout.add(
+        std::make_unique<AudioParameterFloat>(
+            "allPassFreq",
+            "All-Pass Filter",
+            NormalisableRange<float>{-1.f, 1.f},
+            0.f
+        )
+    );
+
     return parameterLayout;
 }
 

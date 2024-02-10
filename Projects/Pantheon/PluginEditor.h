@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 
+#include "FxComponent.h"
 #include "MixerComponent.h"
 #include "PreComponent.h"
 #include "PostComponent.h"
@@ -29,14 +30,15 @@ private:
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    AudioPluginAudioProcessor& processorRef;
-    AudioProcessorValueTreeState& parameters;
+    // AudioPluginAudioProcessor& processorRef;
+    // AudioProcessorValueTreeState& parameters;
     
     //==============================================================================
     MixerComponent mixerComponent;
     PreComponent preComponent;
     PostComponent postComponent;
     FillerComp filler;
+    FxComponent fxComponent;
 
     //==============================================================================
     PanLook panLook;
