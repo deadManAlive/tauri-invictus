@@ -39,7 +39,10 @@ private:
     FillerComp filler;
 
     //==============================================================================
-    TooltipWindow tooltipWindow;
+    PanLook panLook;
+    
+    //==============================================================================
+    GroupComponent border;
 
     // juce::Image backGroundImg = juce::ImageCache::getFromMemory(BinaryData::bgscribble_png, BinaryData::bgscribble_pngSize);
 

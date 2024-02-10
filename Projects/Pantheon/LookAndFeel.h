@@ -16,13 +16,13 @@ public:
     };
 
     //==============================================================================
-    PanLook() = delete;
+    PanLook();
     PanLook(Origin, bool = false);
     PanLook(Origin, Channel, bool = false);
 
     void drawRotarySlider(Graphics&, int, int, int, int, float, float, float, Slider&) override;
     void drawLinearSlider(Graphics&, int, int, int, int, float, float, float, Slider::SliderStyle, Slider&) override;
-    
+    void drawGroupComponentOutline(Graphics&, int, int, const String&, const Justification&, GroupComponent&) override;
     //==============================================================================
     static Colour leftColour;
     static Colour rightColour;

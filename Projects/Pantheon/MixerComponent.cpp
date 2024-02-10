@@ -1,4 +1,5 @@
 #include "MixerComponent.h"
+#include <cstdlib>
 
 MixerComponent::MixerComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : processorRef(p)
@@ -34,23 +35,14 @@ void MixerComponent::paint(juce::Graphics& g) {
 
     const auto bounds = getLocalBounds().toFloat();
     const float width = bounds.getWidth();
-    const float height = bounds.getHeight();
 
-    const auto onepos = rightToLeftGainSlider.getPositionOfValue(1.0f);
-    const auto negonepos = rightToLeftGainSlider.getPositionOfValue(-1.0f);
+    const auto r = rightToLeftGainSlider.getNormalisableRange();
 
-
-    g.setColour (Colours::mintcream);
-    juce::Line<float> ones (juce::Point<float> (width / 4, onepos),
-                            juce::Point<float> (3 * width / 4, onepos));
-    juce::Line<float> zeros (juce::Point<float> (width / 4, height / 2),
-                            juce::Point<float> (3 * width / 4, height / 2));
-    juce::Line<float> negones (juce::Point<float> (width / 4, negonepos),
-                            juce::Point<float> (3 * width / 4, negonepos));
-
-    g.drawLine (zeros, 2.0f);
-    g.drawLine(ones, 2.0f);
-    g.drawLine(negones, 2.0f);
+    for (double s = r.start; s <= r.end; s += 1.) {
+        g.setColour (Colours::linen.withAlpha(0.5f + 0.25f * (float)std::abs(s) / (float)std::abs(r.start)));
+        const auto pos = rightToLeftGainSlider.getPositionOfValue(s);
+        g.drawLine({Point<float>{width / 4, pos}, Point<float>{3 * width / 4, pos}}, 2.f);
+    }
 }
 
 void MixerComponent::resized() {

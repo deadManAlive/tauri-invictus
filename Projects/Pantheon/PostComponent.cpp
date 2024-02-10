@@ -21,6 +21,17 @@ PostComponent::~PostComponent() {}
 
 void PostComponent::paint(juce::Graphics& g) {
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+
+    const auto bounds = getLocalBounds().toFloat();
+    const float height = bounds.getHeight();
+
+    const auto r = leftPostPanSlider.getNormalisableRange();
+
+    for (double s = r.start; s <= r.end; s += 1.) {
+        g.setColour(Colours::linen.withAlpha(0.5f + 0.25f * (float)std::abs(s) / (float)std::abs(r.start)));
+        const auto pos = leftPostPanSlider.getPositionOfValue(s);
+        g.drawLine({Point<float>{pos, 0}, Point<float>{pos, height}}, 2.f);
+    }
 }
 
 void PostComponent::resized() {

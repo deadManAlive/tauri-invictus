@@ -10,12 +10,19 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     , mixerComponent(p, apvts)
     , preComponent(p, apvts)
     , postComponent(p, apvts)
-    , tooltipWindow(this)
 {
+    panLook.setColour(GroupComponent::outlineColourId, Colours::linen);
+    panLook.setColour(GroupComponent::textColourId, Colours::linen);
+
+    border.setLookAndFeel(&panLook);
+    border.setText("Pantheon");
+
     addAndMakeVisible(preComponent);
     addAndMakeVisible(mixerComponent);
     addAndMakeVisible(postComponent);
     addAndMakeVisible(filler);
+    
+    addAndMakeVisible(border);
 
     double ratio = 1./2.;
     int min_height = 200;
@@ -86,10 +93,10 @@ void AudioPluginAudioProcessorEditor::resized()
     using Fr = Grid::Fr;
 
     grid.templateRows = {
-        Track(Fr(3)),
-        Track(Fr(5)),
+        Track(Fr(6)),
+        Track(Fr(10)),
         Track(Fr(1)),
-        Track(Fr(1)),
+        Track(Fr(2)),
     };
     grid.templateColumns = {Track(Fr(1)), Track(Fr(1))};
 
@@ -100,5 +107,6 @@ void AudioPluginAudioProcessorEditor::resized()
         GridItem(postComponent).withArea(4, GridItem::Span(2)),
     };
 
-    grid.performLayout(getLocalBounds());
+    border.setBounds(getLocalBounds().reduced(4));
+    grid.performLayout(getLocalBounds().reduced(16));
 }
