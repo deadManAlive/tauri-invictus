@@ -20,14 +20,15 @@ private:
     using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
     using SliderAttachmentPtr = std::unique_ptr<SliderAttachment>;
 
+    PanLook panLook;
+    PanLook volLook;
+
     Slider inputGainSlider;
     Slider inputPanSlider;
 
     SliderAttachmentPtr inputGainAttachment;
     SliderAttachmentPtr inputPanAttachment;
 
-    PanLook panLook;
-    PanLook volLook;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreComponent)
 };

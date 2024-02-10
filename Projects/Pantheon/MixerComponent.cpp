@@ -4,12 +4,12 @@
 MixerComponent::MixerComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : processorRef(p)
     , parameters(apvts)
+    , leftPanLook(PanLook::Origin::FromMid, PanLook::Channel::Left)
+    , rightPanLook(PanLook::Origin::FromMid, PanLook::Channel::Right)
     , rightToLeftGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , leftPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , rightPreGainSlider(Slider::LinearVertical, Slider::NoTextBox)
     , leftToRightGainSlider(Slider::LinearVertical, Slider::NoTextBox)
-    , leftPanLook(PanLook::Origin::FromMid, PanLook::Channel::Left)
-    , rightPanLook(PanLook::Origin::FromMid, PanLook::Channel::Right)
 {
     addAndMakeVisible(rightToLeftGainSlider);
     rightToLeftGainSlider.setLookAndFeel(&rightPanLook);

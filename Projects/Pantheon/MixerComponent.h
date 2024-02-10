@@ -20,6 +20,9 @@ private:
     using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
     using SliderAttachmentPtr = std::unique_ptr<SliderAttachment>;
 
+    PanLook leftPanLook;
+    PanLook rightPanLook;
+
     Slider rightToLeftGainSlider;
     Slider leftPreGainSlider;
     Slider rightPreGainSlider;
@@ -29,9 +32,6 @@ private:
     SliderAttachmentPtr leftPreGainAttachment = nullptr;
     SliderAttachmentPtr rightPreGainAttachment = nullptr;
     SliderAttachmentPtr leftToRightGainAttachment = nullptr;
-
-    PanLook leftPanLook;
-    PanLook rightPanLook;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixerComponent)
 };

@@ -3,10 +3,10 @@
 PreComponent::PreComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : processorRef(p)
     , parameters(apvts)
-    , inputGainSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
-    , inputPanSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
     , panLook(PanLook::Origin::FromMid)
     , volLook(PanLook::Origin::FromMin)
+    , inputGainSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
+    , inputPanSlider(Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox)
 {
     inputGainSlider.setLookAndFeel(&volLook);
     addAndMakeVisible(inputGainSlider);

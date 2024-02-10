@@ -3,10 +3,10 @@
 PostComponent::PostComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTreeState& apvts)
     : processorRef(p)
     , parameters(apvts)
-    , leftPostPanSlider(Slider::LinearHorizontal, Slider::NoTextBox)
-    , rightPostPanSlider(Slider::LinearHorizontal, Slider::NoTextBox)
     , leftPanLook(PanLook::Origin::FromMin, PanLook::Channel::Left, true)
     , rightPanLook(PanLook::Origin::FromMin, PanLook::Channel::Right)
+    , leftPostPanSlider(Slider::LinearHorizontal, Slider::NoTextBox)
+    , rightPostPanSlider(Slider::LinearHorizontal, Slider::NoTextBox)
 {
     leftPostPanSlider.setLookAndFeel(&leftPanLook);
     addAndMakeVisible(leftPostPanSlider);
