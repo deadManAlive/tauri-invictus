@@ -32,9 +32,9 @@ MixerComponent::~MixerComponent() {}
 void MixerComponent::paint(juce::Graphics& g) {
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    const auto bounds = getLocalBounds();
-    const float width = (float)bounds.getWidth();
-    const float height = (float)bounds.getHeight();
+    const auto bounds = getLocalBounds().toFloat();
+    const float width = bounds.getWidth();
+    const float height = bounds.getHeight();
 
     const auto onepos = rightToLeftGainSlider.getPositionOfValue(1.0f);
     const auto negonepos = rightToLeftGainSlider.getPositionOfValue(-1.0f);

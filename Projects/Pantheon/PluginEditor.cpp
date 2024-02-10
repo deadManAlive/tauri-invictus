@@ -1,3 +1,4 @@
+#include "LookAndFeel.h"
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -19,7 +20,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     double ratio = 1./2.;
     int min_height = 200;
     int max_height = 1080;
-    int default_size = 320;
+    int default_size = 240;
     setResizeLimits(min_height, (int)(min_height/ratio), max_height, (int)(max_height/ratio));
     getConstrainer()->setFixedAspectRatio(ratio);
     setSize(default_size, (int)(default_size/ratio));
@@ -37,7 +38,42 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 }
 
 void FillerComp::paint(Graphics& g) {
-    g.fillAll(Colours::black);
+    const auto bounds = getLocalBounds().toFloat();
+    const auto w = bounds.getWidth();
+    const auto h = bounds.getHeight();
+    const auto headDim = jmin(8.f, 0.2f * h);
+
+    // RIGHT ARROW
+    Point<float> r0{0.5625f * w, 0.f};
+    Point<float> r1{r0.x, 0.75f * h};
+    Point<float> r2{0.3125f * w, r1.y};
+    Point<float> r3{r2.x, 0.f};
+
+    Path rightArrow;
+
+    rightArrow.startNewSubPath(r0);
+    rightArrow.lineTo(r1);
+    rightArrow.lineTo(r2);
+    rightArrow.addArrow({r2, r3}, 0.f, headDim, headDim);
+
+    g.setColour(PanLook::rightColour);
+    g.strokePath(rightArrow, {2.f, PathStrokeType::mitered, PathStrokeType::butt});
+
+    // LEFT ARROW
+    Point<float> l0{0.4375f * w, 0.f};
+    Point<float> l1{l0.x, 0.50f * h};
+    Point<float> l2{0.6875f * w, l1.y};
+    Point<float> l3{l2.x, 0.f};
+
+    Path leftArrow;
+
+    leftArrow.startNewSubPath(l0);
+    leftArrow.lineTo(l1);
+    leftArrow.lineTo(l2);
+    leftArrow.addArrow({l2, l3}, 0.f, headDim, headDim);
+
+    g.setColour(PanLook::leftColour);
+    g.strokePath(leftArrow, {2.f, PathStrokeType::mitered, PathStrokeType::butt});
 }
 
 void AudioPluginAudioProcessorEditor::resized()
@@ -53,15 +89,15 @@ void AudioPluginAudioProcessorEditor::resized()
         Track(Fr(3)),
         Track(Fr(5)),
         Track(Fr(1)),
-        Track(Fr(2)),
+        Track(Fr(1)),
     };
-    grid.templateColumns = {Track(Fr(1))};
+    grid.templateColumns = {Track(Fr(1)), Track(Fr(1))};
 
     grid.items = {
         GridItem(preComponent),
-        GridItem(mixerComponent),
-        GridItem(filler),
-        GridItem(postComponent),
+        GridItem(mixerComponent).withArea(2, GridItem::Span(2)),
+        GridItem(filler).withArea(3, GridItem::Span(2)),
+        GridItem(postComponent).withArea(4, GridItem::Span(2)),
     };
 
     grid.performLayout(getLocalBounds());
