@@ -105,8 +105,10 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     audioOutputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioOutputNode));
 
     for (int ch = 0; ch < 2; ++ch) {
+        // IN -> PRE
         mainProcessor->addConnection({ {audioInputNode->nodeID, ch},
                                        {preProcessorNode->nodeID, ch} });
+        // PRE -> OUT
         mainProcessor->addConnection({{preProcessorNode->nodeID, ch},
                                      {audioOutputNode->nodeID, ch}});
     }

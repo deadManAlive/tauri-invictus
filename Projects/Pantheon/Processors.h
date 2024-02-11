@@ -53,10 +53,7 @@ public:
 private:
     //==============================================================================
     AudioProcessorValueTreeState& parameters;
-
-    // dsp::Gain<float> gain;
     dsp::ProcessorChain<dsp::Gain<float>, dsp::Panner<float>> preProcessorChain;
-
     void updateParameter();
 
     //==============================================================================

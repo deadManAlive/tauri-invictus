@@ -34,15 +34,8 @@ target_compile_definitions(Pantheon
         JUCE_DISPLAY_SPLASH_SCREEN=0
 )
 
-juce_add_binary_data(Pantheon_BinaryData
-  SOURCES
-    "resources/bg.png"
-    "resources/bgscribble.png"
-)
-
 target_link_libraries(Pantheon
     PRIVATE
-        Pantheon_BinaryData
         juce::juce_audio_utils
         juce::juce_dsp
     PUBLIC
