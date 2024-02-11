@@ -51,9 +51,6 @@ private:
     AudioProcessorValueTreeState apvts;
 
     //==============================================================================
-    // LinearSmoothedValue<float> InputGain { 0.f };
-
-    //==============================================================================
     using IOProcessor = AudioProcessorGraph::AudioGraphIOProcessor;
     using Node = AudioProcessorGraph::Node;
 
@@ -61,6 +58,12 @@ private:
 
     Node::Ptr audioInputNode;
     Node::Ptr preProcessorNode;
+
+    Node::Ptr leftPreGainUnitNode;
+    Node::Ptr leftToRightGainUnitNode;
+    Node::Ptr rightToLeftGainUnitNode;
+    Node::Ptr rightPreGainUnitNode;
+
     Node::Ptr leftPostProcessorNode;
     Node::Ptr rightPostProcessorNode;
     Node::Ptr audioOutputNode;

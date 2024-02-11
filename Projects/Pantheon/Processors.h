@@ -8,9 +8,10 @@ class PantheonProcessorBase  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    PantheonProcessorBase()
-        : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo())
+    PantheonProcessorBase(BusesProperties ioLayouts
+        = BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo())
                                            .withOutput ("Output", juce::AudioChannelSet::stereo()))
+        : AudioProcessor (ioLayouts)
     {}
     //==============================================================================
     void prepareToPlay (double, int) override {}
@@ -63,9 +64,60 @@ namespace process {
     };
 
     //==============================================================================
-    enum class Channel {
-        Left,
-        Right,
+    enum Channel {
+        Left = 0,
+        Right = 1,
+    };
+
+    template <Channel SOURCE, Channel TARGET>
+    class MixerProcessor : public PantheonProcessorBase {
+    public:
+        MixerProcessor(AudioProcessorValueTreeState& apvts)
+            : PantheonProcessorBase(BusesProperties().withInput ("Input", juce::AudioChannelSet::mono())
+                                           .withOutput ("Output", juce::AudioChannelSet::mono()))
+            , parameters(apvts)
+        {
+        }
+
+        void prepareToPlay(double sampleRate, int samplesPerBlock) override {
+            gain.setRampDurationSeconds((double)samplesPerBlock / sampleRate);
+            gain.prepare(
+                {sampleRate, (uint32)samplesPerBlock, 1}
+            );
+        }
+
+        void processBlock(AudioSampleBuffer& buffer, MidiBuffer&) override {
+            updateParameter();
+
+            dsp::AudioBlock<float>block(buffer);
+            dsp::ProcessContextReplacing<float>context(block);
+
+            gain.process(context);
+        }
+
+        void reset() override {
+            gain.reset();
+        }
+
+        const String getName() const override {return "Mixer";}
+
+    private:
+        //==============================================================================
+        AudioProcessorValueTreeState& parameters;
+        dsp::Gain<float> gain;
+
+        //==============================================================================
+        static constexpr const char* directions[4] = {"leftPreGain",
+                                                     "leftToRightGain",
+                                                     "rightToLeftGain",
+                                                     "rightPreGain"};
+
+        static constexpr const char* z = directions[(SOURCE << 1) | TARGET];
+
+        void updateParameter() {
+            const auto gainValue = parameters.getRawParameterValue(z)->load();
+            gain.setGainLinear(gainValue);
+        }
     };
 
     //==============================================================================
@@ -106,7 +158,7 @@ namespace process {
         dsp::Panner<float> panner;
         
         //==============================================================================
-        static constexpr auto z = C == Channel::Left ? "leftPan" : "rightPan";
+        static constexpr const char* z = C == Channel::Left ? "leftPan" : "rightPan";
 
         //==============================================================================
         void updateParameter() {

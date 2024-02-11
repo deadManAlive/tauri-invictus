@@ -100,30 +100,68 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     mainProcessor->prepareToPlay(sampleRate, samplesPerBlock);
     mainProcessor->clear();
 
+    //==============================================================================
+    using process::Channel::Left, process::Channel::Right;
+
     audioInputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioInputNode));
+
     preProcessorNode = mainProcessor->addNode(std::make_unique<process::PreProcessor>(apvts));
-    leftPostProcessorNode = mainProcessor->addNode(std::make_unique<process::PostProcessor<process::Channel::Left>>(apvts));
-    rightPostProcessorNode = mainProcessor->addNode(std::make_unique<process::PostProcessor<process::Channel::Right>>(apvts));
+
+    leftPreGainUnitNode = mainProcessor->addNode(std::make_unique<process::MixerProcessor<Left, Left>>(apvts));
+    leftToRightGainUnitNode = mainProcessor->addNode(std::make_unique<process::MixerProcessor<Left, Right>>(apvts));
+    rightToLeftGainUnitNode = mainProcessor->addNode(std::make_unique<process::MixerProcessor<Right, Left>>(apvts));
+    rightPreGainUnitNode = mainProcessor->addNode(std::make_unique<process::MixerProcessor<Right, Right>>(apvts));
+
+    leftPostProcessorNode = mainProcessor->addNode(std::make_unique<process::PostProcessor<Left>>(apvts));
+    rightPostProcessorNode = mainProcessor->addNode(std::make_unique<process::PostProcessor<Right>>(apvts));
+
     audioOutputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioOutputNode));
 
+    //==============================================================================
     for (int ch = 0; ch < 2; ++ch) {
         // IN -> PRE
         mainProcessor->addConnection({ {audioInputNode->nodeID, ch},
                                        {preProcessorNode->nodeID, ch} });
 
-        // PRE -> LEFT POST
-        mainProcessor->addConnection({{preProcessorNode->nodeID, 0},
-                                     {leftPostProcessorNode->nodeID, ch}});
+        if (ch == Left) {
+            // Pre.L -> LL
+            mainProcessor->addConnection({{preProcessorNode->nodeID, Left}, 
+                                          {leftPreGainUnitNode->nodeID, 0}});
 
-        // PRE -> RIGHT POST
-        mainProcessor->addConnection({{preProcessorNode->nodeID, 1},
+            // Pre.L -> LR
+            mainProcessor->addConnection({{preProcessorNode->nodeID, Left},
+                                          {leftToRightGainUnitNode->nodeID, 0}});
+        } else {
+            // Pre.R -> RR
+            mainProcessor->addConnection({{preProcessorNode->nodeID, Right},
+                                          {rightPreGainUnitNode->nodeID, 0}});
+
+            // Pre.R -> RL
+            mainProcessor->addConnection({{preProcessorNode->nodeID, Right},
+                                          {rightToLeftGainUnitNode->nodeID, 0}});
+        }
+
+        // LL => Post.L
+        mainProcessor->addConnection({{leftPreGainUnitNode->nodeID, 0},
+                                      {leftPostProcessorNode->nodeID, ch}});
+
+        // RL => Post.L
+        mainProcessor->addConnection({{rightToLeftGainUnitNode->nodeID, 0},
+                                      {leftPostProcessorNode->nodeID, ch}});
+
+        // RR => Post.R
+        mainProcessor->addConnection({{rightPreGainUnitNode->nodeID, 0},
                                       {rightPostProcessorNode->nodeID, ch}});
-        
-        // LEFT POST -> OUT
+
+        // LR => Post.R
+        mainProcessor->addConnection({{leftToRightGainUnitNode->nodeID, 0},
+                                      {rightPostProcessorNode->nodeID, ch}});
+
+        // Post.L -> OUT
         mainProcessor->addConnection({{leftPostProcessorNode->nodeID, ch},
                                      {audioOutputNode->nodeID, ch}});
 
-        // RIGHT POST -> OUT
+        // Post.R -> OUT
         mainProcessor->addConnection({{rightPostProcessorNode->nodeID, ch},
                                       {audioOutputNode->nodeID, ch}});
     }
