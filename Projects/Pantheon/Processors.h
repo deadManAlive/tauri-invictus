@@ -3,11 +3,11 @@
 #include <JuceHeader.h>
 
 //==============================================================================
-class ProcessorBase  : public juce::AudioProcessor
+class PantheonProcessorBase  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    ProcessorBase()
+    PantheonProcessorBase()
         : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo())
                                            .withOutput ("Output", juce::AudioChannelSet::stereo()))
     {}
@@ -39,7 +39,26 @@ public:
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorBase)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PantheonProcessorBase)
 };
 
 //==============================================================================
+class PreProcessor : public PantheonProcessorBase {
+public:
+    PreProcessor(AudioProcessorValueTreeState&);
+    void prepareToPlay(double, int) override;
+    void processBlock(AudioSampleBuffer&, MidiBuffer&) override;
+    void reset() override;
+    const String getName() const override;
+private:
+    //==============================================================================
+    AudioProcessorValueTreeState& parameters;
+
+    // dsp::Gain<float> gain;
+    dsp::ProcessorChain<dsp::Gain<float>, dsp::Panner<float>> preProcessorChain;
+
+    void updateParameter();
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreProcessor)
+};

@@ -1,7 +1,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "juce_core/system/juce_PlatformDefs.h"
 #include <memory>
+
+#include "Processors.h"
 
 //==============================================================================
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
@@ -92,20 +93,22 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    // prepare APG
     mainProcessor->setPlayConfigDetails(getMainBusNumInputChannels(),
                                         getMainBusNumOutputChannels(),
                                         sampleRate, samplesPerBlock);
-
     mainProcessor->prepareToPlay(sampleRate, samplesPerBlock);
-
     mainProcessor->clear();
 
     audioInputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioInputNode));
-    audiooOutputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioOutputNode));
+    preProcessorNode = mainProcessor->addNode(std::make_unique<PreProcessor>(apvts));
+    audioOutputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioOutputNode));
 
     for (int ch = 0; ch < 2; ++ch) {
         mainProcessor->addConnection({ {audioInputNode->nodeID, ch},
-                                       {audiooOutputNode->nodeID, ch} });
+                                       {preProcessorNode->nodeID, ch} });
+        mainProcessor->addConnection({{preProcessorNode->nodeID, ch},
+                                     {audioOutputNode->nodeID, ch}});
     }
 
     // InputGain.reset(sampleRate, 0.5 / sampleRate);

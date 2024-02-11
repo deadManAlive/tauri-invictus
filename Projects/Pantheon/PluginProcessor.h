@@ -2,7 +2,6 @@
 
 #include <JuceHeader.h>
 #include <memory>
-// #include <memory>
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor
@@ -45,7 +44,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    AudioProcessorValueTreeState::ParameterLayout createParameterLayout(); //TODO: tidy these nasty stuff
+    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 private:
     //==============================================================================
@@ -61,7 +60,8 @@ private:
     std::unique_ptr<AudioProcessorGraph> mainProcessor;
 
     Node::Ptr audioInputNode;
-    Node::Ptr audiooOutputNode;
+    Node::Ptr preProcessorNode;
+    Node::Ptr audioOutputNode;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
