@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-namespace powder {
+namespace tauri {
     template <typename T, int SIZE>
     class LockFreeBufferFixed {
     public:
