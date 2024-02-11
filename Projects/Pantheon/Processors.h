@@ -1,5 +1,6 @@
 #pragma once
 
+#include "juce_core/system/juce_PlatformDefs.h"
 #include <JuceHeader.h>
 
 //==============================================================================
@@ -42,20 +43,78 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PantheonProcessorBase)
 };
 
-//==============================================================================
-class PreProcessor : public PantheonProcessorBase {
-public:
-    PreProcessor(AudioProcessorValueTreeState&);
-    void prepareToPlay(double, int) override;
-    void processBlock(AudioSampleBuffer&, MidiBuffer&) override;
-    void reset() override;
-    const String getName() const override;
-private:
+namespace process {
     //==============================================================================
-    AudioProcessorValueTreeState& parameters;
-    dsp::ProcessorChain<dsp::Gain<float>, dsp::Panner<float>> preProcessorChain;
-    void updateParameter();
+    class PreProcessor : public PantheonProcessorBase {
+    public:
+        PreProcessor(AudioProcessorValueTreeState&);
+        void prepareToPlay(double, int) override;
+        void processBlock(AudioSampleBuffer&, MidiBuffer&) override;
+        void reset() override;
+        const String getName() const override {return "Pre";}
+    private:
+        //==============================================================================
+        AudioProcessorValueTreeState& parameters;
+        dsp::ProcessorChain<dsp::Gain<float>, dsp::Panner<float>> preProcessorChain;
+        void updateParameter();
+
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreProcessor)
+    };
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreProcessor)
-};
+    enum class Channel {
+        Left,
+        Right,
+    };
+
+    //==============================================================================
+    template<Channel C>
+    class PostProcessor : public PantheonProcessorBase {
+    public:
+        PostProcessor(AudioProcessorValueTreeState& apvts)
+            : parameters(apvts)
+        {
+        }
+
+        void prepareToPlay(double sampleRate, int samplesPerBlock) override {
+            panner.setRule(juce::dsp::PannerRule::balanced);
+            panner.prepare(
+            {sampleRate, (uint32)samplesPerBlock, 2}
+            );
+        }
+        
+        void processBlock(AudioSampleBuffer& buffer, MidiBuffer&) override {
+            updateParameter();
+
+            dsp::AudioBlock<float>block(buffer);
+            dsp::ProcessContextReplacing<float>context(block);
+
+            panner.process(context);
+        }
+
+        void reset() override {
+            panner.reset();
+        }
+        
+        const String getName() const override {
+            return "Post";
+        }
+    private:
+        //==============================================================================
+        AudioProcessorValueTreeState& parameters;
+        dsp::Panner<float> panner;
+        
+        //==============================================================================
+        static constexpr auto z = C == Channel::Left ? "leftPan" : "rightPan";
+
+        //==============================================================================
+        void updateParameter() {
+            const auto panValue = parameters.getRawParameterValue(z)->load();
+            panner.setPan(panValue);
+        }
+
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PostProcessor)
+    };
+}

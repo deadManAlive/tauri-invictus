@@ -101,19 +101,32 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     mainProcessor->clear();
 
     audioInputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioInputNode));
-    preProcessorNode = mainProcessor->addNode(std::make_unique<PreProcessor>(apvts));
+    preProcessorNode = mainProcessor->addNode(std::make_unique<process::PreProcessor>(apvts));
+    leftPostProcessorNode = mainProcessor->addNode(std::make_unique<process::PostProcessor<process::Channel::Left>>(apvts));
+    rightPostProcessorNode = mainProcessor->addNode(std::make_unique<process::PostProcessor<process::Channel::Right>>(apvts));
     audioOutputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioOutputNode));
 
     for (int ch = 0; ch < 2; ++ch) {
         // IN -> PRE
         mainProcessor->addConnection({ {audioInputNode->nodeID, ch},
                                        {preProcessorNode->nodeID, ch} });
-        // PRE -> OUT
-        mainProcessor->addConnection({{preProcessorNode->nodeID, ch},
-                                     {audioOutputNode->nodeID, ch}});
-    }
 
-    // InputGain.reset(sampleRate, 0.5 / sampleRate);
+        // PRE -> LEFT POST
+        mainProcessor->addConnection({{preProcessorNode->nodeID, 0},
+                                     {leftPostProcessorNode->nodeID, ch}});
+
+        // PRE -> RIGHT POST
+        mainProcessor->addConnection({{preProcessorNode->nodeID, 1},
+                                      {rightPostProcessorNode->nodeID, ch}});
+        
+        // LEFT POST -> OUT
+        mainProcessor->addConnection({{leftPostProcessorNode->nodeID, ch},
+                                     {audioOutputNode->nodeID, ch}});
+
+        // RIGHT POST -> OUT
+        mainProcessor->addConnection({{rightPostProcessorNode->nodeID, ch},
+                                      {audioOutputNode->nodeID, ch}});
+    }
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -155,8 +168,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    // auto sampleNum = buffer.getNumSamples();
-
+    
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -167,11 +179,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
     
     mainProcessor->processBlock(buffer, midiMessages);
-
-    // auto inputGainValue = apvts.getRawParameterValue("inputGain")->load();
-    // InputGain.setTargetValue(inputGainValue);
-
-    // buffer.applyGain(InputGain.getNextValue());
 }
 
 //==============================================================================

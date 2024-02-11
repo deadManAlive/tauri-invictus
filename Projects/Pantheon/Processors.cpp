@@ -1,40 +1,38 @@
 #include "Processors.h"
 
-PreProcessor::PreProcessor(AudioProcessorValueTreeState& apvts)
-    : parameters(apvts)
-{
-}
+namespace process {
+    PreProcessor::PreProcessor(AudioProcessorValueTreeState& apvts)
+        : parameters(apvts)
+    {
+    }
 
-void PreProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
-    preProcessorChain.get<0>().setRampDurationSeconds((double)samplesPerBlock / sampleRate);
-    preProcessorChain.get<1>().setRule(dsp::PannerRule::squareRoot3dB);
-    
-    preProcessorChain.prepare(
-        {sampleRate, (uint32)samplesPerBlock, 2}
-    );
-}
+    void PreProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
+        preProcessorChain.get<0>().setRampDurationSeconds((double)samplesPerBlock / sampleRate);
+        preProcessorChain.get<1>().setRule(dsp::PannerRule::squareRoot3dB);
 
-void PreProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&) {
-    updateParameter();
+        preProcessorChain.prepare(
+            {sampleRate, (uint32)samplesPerBlock, 2}
+        );
+    }
 
-    dsp::AudioBlock<float>block(buffer);
-    dsp::ProcessContextReplacing<float>context(block);
+    void PreProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&) {
+        updateParameter();
 
-    preProcessorChain.process(context);
-}
+        dsp::AudioBlock<float>block(buffer);
+        dsp::ProcessContextReplacing<float>context(block);
 
-void PreProcessor::reset() {
-    preProcessorChain.reset();
-}
+        preProcessorChain.process(context);
+    }
 
-const String PreProcessor::getName() const {
-    return "Pre";
-}
+    void PreProcessor::reset() {
+        preProcessorChain.reset();
+    }
 
-void PreProcessor::updateParameter() {
-    const auto gainValue = parameters.getRawParameterValue("inputGain")->load();
-    preProcessorChain.get<0>().setGainLinear(gainValue);
+    void PreProcessor::updateParameter() {
+        const auto gainValue = parameters.getRawParameterValue("inputGain")->load();
+        preProcessorChain.get<0>().setGainLinear(gainValue);
 
-    const auto panValue = parameters.getRawParameterValue("inputPan")->load();
-    preProcessorChain.get<1>().setPan(panValue);
+        const auto panValue = parameters.getRawParameterValue("inputPan")->load();
+        preProcessorChain.get<1>().setPan(panValue);
+    }
 }

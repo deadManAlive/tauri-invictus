@@ -61,6 +61,8 @@ private:
 
     Node::Ptr audioInputNode;
     Node::Ptr preProcessorNode;
+    Node::Ptr leftPostProcessorNode;
+    Node::Ptr rightPostProcessorNode;
     Node::Ptr audioOutputNode;
 
     //==============================================================================
