@@ -18,6 +18,7 @@ FxComponent::FxComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTreeSt
     preFxButton.setButtonText("Pre");
     preFxButton.setConnectedEdges(TextButton::ConnectedOnRight);
     preFxButton.setRadioGroupId(fxPositionRadioButtonId);
+    preFxButton.onClick = [this](){fxPositionToggleUpdate(true);};
     addAndMakeVisible(preFxButton);
 
     postFxButton.setLookAndFeel(&panLook);
@@ -25,6 +26,7 @@ FxComponent::FxComponent(AudioPluginAudioProcessor& p, AudioProcessorValueTreeSt
     postFxButton.setButtonText("Post");
     postFxButton.setConnectedEdges(TextButton::ConnectedOnLeft);
     postFxButton.setRadioGroupId(fxPositionRadioButtonId);
+    postFxButton.onClick = [this](){fxPositionToggleUpdate(false);};
     addAndMakeVisible(postFxButton);
 
     delayLineSlider.setLookAndFeel(&panLook);

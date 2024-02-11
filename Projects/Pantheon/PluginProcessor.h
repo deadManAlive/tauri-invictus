@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <memory>
 // #include <memory>
 
 //==============================================================================
@@ -48,10 +49,19 @@ public:
 
 private:
     //==============================================================================
-    LinearSmoothedValue<float> InputGain { 0.f };
+    AudioProcessorValueTreeState apvts;
 
     //==============================================================================
-    AudioProcessorValueTreeState apvts;
+    // LinearSmoothedValue<float> InputGain { 0.f };
+
+    //==============================================================================
+    using IOProcessor = AudioProcessorGraph::AudioGraphIOProcessor;
+    using Node = AudioProcessorGraph::Node;
+
+    std::unique_ptr<AudioProcessorGraph> mainProcessor;
+
+    Node::Ptr audioInputNode;
+    Node::Ptr audiooOutputNode;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

@@ -14,6 +14,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
+    , mainProcessor(new AudioProcessorGraph())
 {
 }
 
@@ -91,15 +92,30 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    InputGain.reset(sampleRate, 0.5 / sampleRate);
-    
-    juce::ignoreUnused (samplesPerBlock);
+    mainProcessor->setPlayConfigDetails(getMainBusNumInputChannels(),
+                                        getMainBusNumOutputChannels(),
+                                        sampleRate, samplesPerBlock);
+
+    mainProcessor->prepareToPlay(sampleRate, samplesPerBlock);
+
+    mainProcessor->clear();
+
+    audioInputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioInputNode));
+    audiooOutputNode = mainProcessor->addNode(std::make_unique<IOProcessor>(IOProcessor::audioOutputNode));
+
+    for (int ch = 0; ch < 2; ++ch) {
+        mainProcessor->addConnection({ {audioInputNode->nodeID, ch},
+                                       {audiooOutputNode->nodeID, ch} });
+    }
+
+    // InputGain.reset(sampleRate, 0.5 / sampleRate);
 }
 
 void AudioPluginAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    mainProcessor->releaseResources();
 }
 
 bool AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -144,16 +160,13 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+    
+    mainProcessor->processBlock(buffer, midiMessages);
 
+    // auto inputGainValue = apvts.getRawParameterValue("inputGain")->load();
+    // InputGain.setTargetValue(inputGainValue);
 
-    auto inputGainValue = apvts.getRawParameterValue("inputGain")->load();
-    InputGain.setTargetValue(inputGainValue);
-
-    // auto fxPosition = apvts.getRawParameterValue("fxPosition")->load();
-
-    // DBG(fxPosition);
-
-    buffer.applyGain(InputGain.getNextValue());
+    // buffer.applyGain(InputGain.getNextValue());
 }
 
 //==============================================================================

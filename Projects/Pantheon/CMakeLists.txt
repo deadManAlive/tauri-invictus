@@ -23,6 +23,7 @@ target_sources(Pantheon
     PluginProcessor.cpp
     PostComponent.cpp
     PreComponent.cpp
+    Processors.cpp
 )
 
 target_compile_definitions(Pantheon
