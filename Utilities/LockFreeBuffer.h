@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-namespace tauri {
+namespace taurus {
     template <typename T, int SIZE>
     class LockFreeBufferFixed {
     public:

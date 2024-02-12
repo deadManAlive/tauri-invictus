@@ -67,7 +67,7 @@ private:
     //==============================================================================
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
-    tauri::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
+    taurus::LockFreeBufferFixed<float, 4 * fftSize> lockFreeBuffer;
 
     //==============================================================================
     using FftContainerType = std::array<float, 2 * fftSize>;
