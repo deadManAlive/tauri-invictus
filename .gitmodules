@@ -4,3 +4,6 @@
 [submodule "melatonin_perfetto"]
 	path = melatonin_perfetto
 	url = https://github.com/sudara/melatonin_perfetto.git
+[submodule "Projects/Pantheon"]
+	path = Projects/Pantheon
+	url = https://github.com/deadManAlive/Pantheon.git
