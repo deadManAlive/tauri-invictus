@@ -7,3 +7,6 @@
 [submodule "Projects/Pantheon"]
 	path = Projects/Pantheon
 	url = https://github.com/deadManAlive/Pantheon.git
+[submodule "Projects/Powder"]
+	path = Projects/Powder
+	url = https://github.com/deadManAlive/taurus-invictus-powder.git
