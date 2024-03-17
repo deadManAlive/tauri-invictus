@@ -15,6 +15,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
@@ -31,6 +32,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
@@ -38,15 +40,6 @@
                 "JUCE_BUILD_EXAMPLES": "OFF",
                 "PERFETTO": "ON"
             }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "default-build",
-            "description": "default build preset",
-            "displayName": "Default Build",
-            "configurePreset": "default",
-            "jobs": 8
         }
     ]
 }
