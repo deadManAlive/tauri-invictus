@@ -1,0 +1,52 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 15,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Default",
+            "description": "default configuration preset",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "JUCE_BUILD_EXTRAS": "OFF",
+                "JUCE_BUILD_EXAMPLES": "OFF"
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "description": "debug configuration preset",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "JUCE_BUILD_EXTRAS": "OFF",
+                "JUCE_BUILD_EXAMPLES": "OFF",
+                "PERFETTO": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "default-build",
+            "description": "default build preset",
+            "displayName": "Default Build",
+            "configurePreset": "default",
+            "jobs": 8
+        }
+    ]
+}
